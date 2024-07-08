@@ -212,3 +212,71 @@ class Server(models.Model):
 
     def __str__(self):
         return f"{self.name} (ID: {self.id})"
+
+
+class Channel(models.Model):
+    """
+    Channel within a server in the system.
+    """
+
+    name = models.CharField(max_length=50)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="channel_owner"
+    )
+    topic = models.CharField(max_length=100)
+    server = models.ForeignKey(
+        Server, on_delete=models.CASCADE, related_name="channel_server"
+    )
+
+    def __str__(self):
+        return self.name
+
+
+        #  SUMMARY
+
+"""Upload Path Functions: category_icon_upload_path, channel_icon_upload_path,
+and channel_banner_img_upload_path are responsible for defining the upload
+paths for each file related to a category or channel.
+
+Category Class: Defines the Category model with fields for the name, description,
+and icon. You're also overwriting the default save method to handle the deletion
+of the old icon when a new one is uploaded, and scaling down the image size if 
+there's a new icon. You have also defined a receiver for pre_delete signal to
+delete the icon file from the filesystem when the Category instance is deleted.
+
+Server Class: Defines the Server model with fields for the name, owner, category,
+description, and members.
+
+Channel Class: Defines the Channel model with fields for the name, owner,
+topic, server, banner image, and icon. Similar to the Category model, you're 
+overwriting the default save method to handle the deletion of the old icon and
+banner image when new ones are uploaded, and scaling down the image size if
+there's a new icon or banner image.
+
+pre_delete signal receiver for Server: You have a receiver function that gets
+triggered before a Server instance is deleted. It loops over specific fields
+(in this case, "icon" and "banner") and deletes the associated files from the
+filesystem.
+
+You've done a great job with your Django models, ensuring that file paths
+are properly handled and unnecessary files are deleted when they are replaced
+or their associated model instance is deleted. This is good practice to avoid 
+accumulation of unused files in your storage.
+
+One potential improvement you could make would be to add docstrings for the 
+Server and Channel classes, similar to what you have done for the Category
+class. This can help others understand what these models represent and how 
+they are structured.
+
+Also, for the pre_delete signal receiver for the Server model, you've used
+the sender as "server.Server". While this should work, it might be better to 
+use the actual Server model class as the sender for consistency and to ensure
+that the receiver function gets correctly hooked to the Server model's pre_delete
+signal.
+
+Finally, make sure you have defined the scale_down_image function in your
+.utils module, as it is called in your overridden save methods but not defined
+
+within this code. And remember to import and configure the models in your 
+Django admin site if you want to manage them via the Django admin interface.
+"""
