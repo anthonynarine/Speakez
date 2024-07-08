@@ -2,6 +2,7 @@ from pathlib import Path
 from decouple import config
 from .logging_conf import julia_fiesta_logs
 import os
+from datetime import timedelta
 
 julia_fiesta_logs()
 
@@ -126,9 +127,23 @@ AUTH_USER_MODEL = "account.Account"
 # ... ..ADDED....
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        # "rest_framework.authentication.SessionAuthentication",
-        # "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "account.authenticate.JWTCookieAuthentication",
-    ],
+    # "DEFAULT_AUTHENTICATION_CLASSES": [
+    #     # "rest_framework.authentication.SessionAuthentication",
+    #     # "rest_framework_simplejwt.authentication.JWTAuthentication",
+    #     "account.authenticate.JWTCookieAuthentication",
+    # ],
+}
+
+
+# ...ADDED...
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  #TESTING TIMER
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS384",
+    #JWTcookie
+    "ACCESS_TOKEN_NAME": "access_token",
+    "REFRESH_TOKEN_NAME": "refresh_token",
+    "JWT_COOKIE_SAMESITE": "LAX"
 }
