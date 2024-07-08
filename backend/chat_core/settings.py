@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 from decouple import config
 from .logging_conf import julia_fiesta_logs
@@ -25,6 +23,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd party
+    "rest_framework",
+    "corsheaders",
+    "drf_spectacular",
+    # Local
+    "server",
+    "account", 
 ]
 
 MIDDLEWARE = [
@@ -36,12 +41,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 3rd party
-    "rest_framework",
-    "corsheaders",
-    # Local
-    ""
+    
 ]
+
+
 
 ROOT_URLCONF = "chat_core.urls"
 
@@ -106,12 +109,26 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = "static/"
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+# ..Added bot heeded to create a media folder (handling images)
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "media/"
+
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ... ..ADDED....
+AUTH_USER_MODEL = "account.Account"
+
+
+# ... ..ADDED....
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # "rest_framework.authentication.SessionAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "account.authenticate.JWTCookieAuthentication",
+    ],
+}
