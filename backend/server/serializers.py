@@ -34,10 +34,8 @@ class ServerSerializer(serializers.ModelSerializer):
         This method is used to get the value of the 'num_members' field, if it is present.
         'num_members' is not a model field but is added in a view using annotate().
         """
-        if hasattr(obj, "num_members"):
-            return obj.num_members
-        else:
-            return None
+        return getattr(obj, "num_members", None)
+
     
     def to_representation(self, instance) -> Dict[str, Any]:
         """
