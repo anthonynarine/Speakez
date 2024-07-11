@@ -1,3 +1,4 @@
+import logging
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
@@ -8,6 +9,7 @@ from .utils.scale_image import scale_down_image
 from .validators.image_validators import validate_icon_image_size, validate_image_file_extension
 from .utils.image_path import category_icon_upload_path, server_banner_img_upload_path, server_icon_upload_path
 
+logger = logging.getLogger(__name__)
 
 class Category(models.Model):
     """
@@ -52,9 +54,10 @@ class Category(models.Model):
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments."""
         if self.id:
-            existing = get_object_or_404(Category, id=self.id)
-            if existing.icon != self.icon:
-                existing.icon.delete(save=False)
+            existing_category = get_object_or_404(Category, id=self.id)
+            if existing_category.icon != self.icon:
+                logger.debug(f'Deleting old icon for category {self.name}')
+                existing_category.icon.delete(save=False)
         self.name = self.name.lower()
 
         # if self.icon:
@@ -88,6 +91,7 @@ class Category(models.Model):
             **kwargs: Arbitrary keyword arguments.
         """
         if instance.icon:
+            logger.debug(f'Deleting icon for category "{instance.name}"')
             instance.icon.delete(save=False)
 
     def __str__(self):

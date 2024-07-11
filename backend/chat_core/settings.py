@@ -114,7 +114,7 @@ STATIC_URL = "static/"
 
 # ..Added bot heeded to create a media folder (handling images)
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 
 
 
