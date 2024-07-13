@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 
@@ -31,6 +31,11 @@ const SecondaryDraw = function ({ children }) {
         overflow: "auto",
       }}
     >
+      {[...Array(40)].map((_, i) => (
+        <Typography key={i} paragraph>
+          {i + 1}
+        </Typography>
+      ))}
       {children}
     </Box>
   );
