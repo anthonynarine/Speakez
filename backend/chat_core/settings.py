@@ -12,8 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["localhost:3000"]
 
 # Application definition
 
@@ -134,7 +133,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-
 # ...ADDED...
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  #TESTING TIMER
@@ -147,3 +145,21 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_NAME": "refresh_token",
     "JWT_COOKIE_SAMESITE": "LAX"
 }
+
+
+# CORS Headers Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://ant-django-auth-62cf01255868.herokuapp.com",
+    # Additional origins...
+]
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    "https://ant-django-auth-62cf01255868.herokuapp.com",
+
+    # Additional trusted origins...
+]

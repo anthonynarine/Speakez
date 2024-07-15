@@ -3,18 +3,20 @@ import  PrimaryAppBar  from "../pages/scaffold/primaryAppBar/PrimaryAppBar"
 import PrimaryDraw from "./scaffold/primaryDraw/PrimaryDrawer";
 import SecondaryDraw from "./scaffold/secondaryDraw/SecondaryDraw"
 import Main from "./scaffold/main/Main"
+import PopularChannels from "../components/popularChannels/PopularChannels";
 
 
 const Homepage = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <CssBaseline>
+      <CssBaseline />
         <PrimaryAppBar />
-        <PrimaryDraw></PrimaryDraw>
-        <SecondaryDraw />
+        <PrimaryDraw>
+          <PopularChannels open={true}/>
+        </PrimaryDraw>
+        <SecondaryDraw ></SecondaryDraw>
         <Main />
-      </CssBaseline>
     </Box>
   );
 };

@@ -55,39 +55,27 @@ const PrimaryDraw = function ({ children }) {
         },
       }}
     >
-      <Box
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <Box>
         <Box
           sx={{
-            position: "relative",
+            position: "absolute",
+            top: 0,
+            right: 0,
             p: 0,
             width: open ? "auto" : "100%",
-            flexShrink: 0,
-            display: 'flex',
-            justifyContent: 'flex-end'
+            overflow: "hidden"
           }}
         >
           <DrawerToggle open={open} openDrawer={openDrawer} closeDrawer={closeDrawer} />
-        </Box>
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: 'auto', // Enable vertical scrolling
-          }}
-        >
           {[...Array(40)].map((_, i) => (
-            <Typography key={i} paragraph>
-              {i + 1}
-            </Typography>
-          ))}
-          {childrenWithProps}
+        <Typography key={i} paragraph>
+          {i + 1}
+        </Typography>
+      ))}
         </Box>
+        {childrenWithProps}
       </Box>
+
     </CustomDrawer>
   );
 };
