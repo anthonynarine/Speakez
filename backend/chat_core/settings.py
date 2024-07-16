@@ -12,7 +12,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ["localhost:3000"]
+ALLOWED_HOSTS = [
+    '127.0.0.1',  # Localhost IP for backend
+    'localhost',  # Localhost name for backend
+    'localhost:3000',  # Localhost with port for frontend
+    # You can add more hostnames or IPs here if needed
+]
 
 # Application definition
 
@@ -132,6 +137,7 @@ REST_FRAMEWORK = {
         # "account.authenticate.JWTCookieAuthentication",
     ],
 }
+
 
 # ...ADDED...
 SIMPLE_JWT = {

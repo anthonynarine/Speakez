@@ -3,7 +3,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box,
   Typography,
   ListItemButton,
 } from "@mui/material";
@@ -17,7 +16,7 @@ import { useCrud } from "../../hooks/useCrud";
 const MEDIA_URL = process.env.MEDIA_URL;
 
 const PopularChannels = ({ open }) => {
-  const { dataCRUD, error, isLoading, fetchData } = useCrud();
+  const {  error, isLoading, fetchData } = useCrud();
 
 //   useEffect(() => {
 //     fetchData("server/select/");
@@ -29,23 +28,8 @@ const PopularChannels = ({ open }) => {
 
   return (
     <>
-      <Box
-        sx={{
-          height: 50,
-          p: 2,
-          display: "flex",
-          alignItems: "center",
-          flex: "1 1 100%",
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{ display: open ? "block" : "none", color: "#637C5B" }}
-        >
-          Popular
-        </Typography>
-      </Box>
-      {/* <List>
+
+      <List>
         {dataCRUD.map((server) => (
           <ListItem
             key={server.id}
@@ -99,7 +83,7 @@ const PopularChannels = ({ open }) => {
             </Link>
           </ListItem>
         ))}
-      </List> */}
+      </List>
     </>
   );
 };

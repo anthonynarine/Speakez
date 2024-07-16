@@ -21,7 +21,6 @@ const PrimaryDraw = function ({ children }) {
   // State to control the drawer's open/close state
   const [open, setOpen] = useState(false);
 
-
   // Effect to update the drawer's open state when the screen size changes
   useEffect(() => {
     // If the screen size is below 600px, set the drawer to be closed (temporary variant)
@@ -37,7 +36,7 @@ const PrimaryDraw = function ({ children }) {
     setOpen(false);
   };
 
-  // Clone each child element and pass the `open` prop to it
+  // Clone each child element and pass the open prop to it
   const childrenWithProps = React.Children.map(children, (child) =>
     React.isValidElement(child) ? React.cloneElement(child, { open }) : child
   );
@@ -52,30 +51,50 @@ const PrimaryDraw = function ({ children }) {
           mt: `${theme.primaryAppBar.height}px`,
           height: `calc(100vh - ${theme.primaryAppBar.height}px)`,
           width: theme.primaryDraw.width,
+          display: 'flex',
+          flexDirection: 'column',
         },
       }}
     >
-      <Box>
-        <Box
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: theme.spacing(0),
+          // borderBottom: `1px solid ${theme.palette.divider}`,
+          position: 'relative',
+        }}
+      >
+        <Typography
+          variant="h6"
           sx={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            p: 0,
-            width: open ? "auto" : "100%",
-            overflow: "hidden"
+            display: open ? "block" : "none",
+            color: "#637C5B",
+            position: 'absolute',
+            left: '30%',
+            transform: 'translateX(-50%)',
           }}
         >
-          <DrawerToggle open={open} openDrawer={openDrawer} closeDrawer={closeDrawer} />
-          {[...Array(40)].map((_, i) => (
-        <Typography key={i} paragraph>
-          {i + 1}
+          Servers
         </Typography>
-      ))}
+        <Box sx={{ marginLeft: 'auto' }}>
+          <DrawerToggle open={open} openDrawer={openDrawer} closeDrawer={closeDrawer} />
         </Box>
+      </Box>
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: theme.spacing(2),
+        }}
+      >
+        {[...Array(40)].map((_, i) => (
+          <Typography key={i} paragraph>
+            {i + 1}
+          </Typography>
+        ))}
         {childrenWithProps}
       </Box>
-
     </CustomDrawer>
   );
 };
