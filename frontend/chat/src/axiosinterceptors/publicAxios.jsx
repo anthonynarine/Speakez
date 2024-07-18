@@ -1,10 +1,14 @@
 import axios from "axios";
 
-const DEV_URL = process.env.REACT_APP_DEV_URL;
+const baseURL = process.env.REACT_APP_DEV_URL;
+
+// Log the environment variables to verify them
+console.log('Use Production API:', process.env.REACT_APP_USE_PRODUCTION_API);
+console.log('Base URL:', baseURL);
 
 // Axios instance for public (non-authenticated) requests. Configured with base URL and CSRF token handling.
 const publicAxios = axios.create({
-  baseURL: DEV_URL, 
+  baseURL: baseURL, 
   withCredentials: true, // Necessary for cookies, especially if CSRF protection is enabled server-side.
 });
 

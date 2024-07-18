@@ -16,21 +16,21 @@ import { useCrud } from "../../hooks/useCrud";
 const MEDIA_URL = process.env.MEDIA_URL;
 
 const PopularChannels = ({ open }) => {
-  const {  error, isLoading, fetchData } = useCrud();
+  const {  error, isLoading, serverData, fetchData } = useCrud();
 
-//   useEffect(() => {
-//     fetchData("server/select/");
-//   }, []);
+  useEffect(() => {
+    fetchData("server/select/");
+  }, []);
 
-//   useEffect(() => {
-//     console.log("Servers", dataCRUD);
-//   }, [dataCRUD]);
+  useEffect(() => {
+    console.log("Servers", serverData);
+  }, [serverData]);
 
   return (
     <>
 
       <List>
-        {dataCRUD.map((server) => (
+        {serverData.map((server) => (
           <ListItem
             key={server.id}
             disableGutters
