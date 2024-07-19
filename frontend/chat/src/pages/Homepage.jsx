@@ -3,7 +3,8 @@ import  PrimaryAppBar  from "../pages/scaffold/primaryAppBar/PrimaryAppBar"
 import PrimaryDraw from "./scaffold/primaryDraw/PrimaryDrawer";
 import SecondaryDraw from "./scaffold/secondaryDraw/SecondaryDraw"
 import Main from "./scaffold/main/Main"
-import PopularChannels from "../components/popularChannels/PopularChannels";
+import PopularChannels from "../components/primaryDraw/PopularChannels";
+import ExploreCategories from "../components/secondaryDraw/ExploreCategories";
 
 
 const Homepage = () => {
@@ -13,9 +14,11 @@ const Homepage = () => {
       <CssBaseline />
         <PrimaryAppBar />
         <PrimaryDraw>
-          <PopularChannels open={true}/>
+          <PopularChannels open={false}/>
         </PrimaryDraw>
-        <SecondaryDraw ></SecondaryDraw>
+        <SecondaryDraw>
+          <ExploreCategories /> 
+        </SecondaryDraw>
         <Main />
     </Box>
   );

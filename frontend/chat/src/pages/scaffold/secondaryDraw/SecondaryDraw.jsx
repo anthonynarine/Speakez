@@ -31,11 +31,11 @@ const SecondaryDraw = function ({ children }) {
         overflow: "auto",
       }}
     >
-      {[...Array(40)].map((_, i) => (
+      {/* {[...Array(40)].map((_, i) => (
         <Typography key={i} paragraph>
           {i + 1}
         </Typography>
-      ))}
+      ))} */}
       {children}
     </Box>
   );

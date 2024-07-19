@@ -17,16 +17,16 @@ const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
 
 const PopularChannels = ({ open }) => {
-  const {  error, isLoading, serverData, fetchData } = useCrud();
+  const {  error, isLoading, serverData, fetchData } = useCrud("server/select/");
 
   useEffect(() => {
-    fetchData("server/select/");
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log("PopularChannels Data", serverData);
-    console.log("Media URL", MEDIA_URL)
-  }, [serverData]);
+  // useEffect(() => {
+  //   console.log("PopularChannels Data", serverData);
+  //   console.log("Media URL", MEDIA_URL)
+  // }, [serverData]);
 
   return (
     <>

@@ -6,7 +6,7 @@ export const useCrud = (apiURL) => {
     const [error, setError] = useState(null);
     const [serverData, setServerData] = useState([]);
 
-    const fetchData = useCallback(async (apiURL) => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
