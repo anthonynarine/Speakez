@@ -1,34 +1,37 @@
+import { useState, useCallback, } from "react";
 import { publicAxios } from "../axiosinterceptors/publicAxios";
-import { useState, useCallback, useEffect } from "react"
 
 export const useCrud = (apiURL) => {
-    const [isLoading, setIsloading] = useState(false);
-    const [error, setError] = useState("")
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [serverData, setServerData] = useState([]);
 
-    const fetchData = useCallback(async (apiURL)=> {
-        setIsloading(true);
+    const fetchData = useCallback(async (apiURL) => {
+        setIsLoading(true);
         setError(null);
         try {
+            console.log("Fetching data from API URL in useCrud:", apiURL);
             const { data } = await publicAxios.get(apiURL);
-            setServerData(data);
+            console.log("API response data:", data);
+
+            if (Array.isArray(data)) {
+                setServerData(data);
+            } else {
+                setError("Unexpected API response format");
+            }
+
         } catch (error) {
-            setError(error.response?.data?.error || "Something went wrong")
+            setError(error.response?.data?.error || "Something went wrong");
         } finally {
-            setIsloading(false);
+            setIsLoading(false);
         }
-        
     }, [apiURL]);
 
-    useEffect(() => {
-        fetchData(); // Fetch data when the component mounts
-    }, [fetchData])
 
-    return{
+    return {
         fetchData,
         serverData,
         isLoading,
         error
-    }
-    
+    };
 };

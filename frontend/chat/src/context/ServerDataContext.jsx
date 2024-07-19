@@ -1,6 +1,6 @@
 // src/context/ServerDataContext.js
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { useCrud } from "../hooks/useCrud";
 
 // Create context for server data
@@ -26,13 +26,18 @@ export function useServerData() {
 // Provider component for server data
 // This component fetches the server data and provides it to its children
 export function ServerDataProvider({ children }) {
-  // Use the useCrud hook to fetch server data from the specified endpoint
-  const serverData = useCrud("server/select/");
-  console.log("FETCHED DATA", serverData)
+  const apiURL = "/server/select/";
+  console.log("Using API URL in ServerDataProvider:", apiURL);
+
+  const { data: serverData, isLoading, error, } = useCrud(apiURL);
+
+  console.log("FETCHED DATA", { serverData });
+
+
 
   // Provide the server data to the children components via context
   return (
-    <ServerDataContext.Provider value={serverData}>
+    <ServerDataContext.Provider value={{serverData, isLoading, error,}}>
       {children}
     </ServerDataContext.Provider>
   );

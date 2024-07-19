@@ -88,11 +88,11 @@ const PrimaryDraw = function ({ children }) {
           padding: theme.spacing(2),
         }}
       >
-        {[...Array(40)].map((_, i) => (
+        {/* {[...Array(40)].map((_, i) => (
           <Typography key={i} paragraph>
             {i + 1}
           </Typography>
-        ))}
+        ))} */}
         {childrenWithProps}
       </Box>
     </CustomDrawer>

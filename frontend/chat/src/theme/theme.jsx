@@ -16,7 +16,7 @@ export const createMuiTheme = (mode) => {
         },
         primaryDraw: {
             width: 240, // Width value for the primary drawer when open
-            closed: 80 // Width value for the primary drawer when closed
+            closed: 70 // Width value for the primary drawer when closed
         },
         secondaryDraw: {
             width: 240 // Width value for the secondary drawer

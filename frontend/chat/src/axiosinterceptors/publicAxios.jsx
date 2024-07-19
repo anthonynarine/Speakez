@@ -1,31 +1,31 @@
 import axios from "axios";
 
-const baseURL = process.env.REACT_APP_DEV_URL;
+// Ensure environment variables are correctly set
+const baseURL = process.env.REACT_APP_DEV_URL || "http://localhost:8000/api";
 
-// Log the environment variables to verify them
+// Log environment variables to verify them
 console.log('Use Production API:', process.env.REACT_APP_USE_PRODUCTION_API);
 console.log('Base URL:', baseURL);
 
-// Axios instance for public (non-authenticated) requests. Configured with base URL and CSRF token handling.
+// Create Axios instance for public (non-authenticated) requests
 const publicAxios = axios.create({
-  baseURL: baseURL, 
-  withCredentials: true, // Necessary for cookies, especially if CSRF protection is enabled server-side.
+  baseURL: baseURL,
+  withCredentials: true, // Necessary for cookies, especially if CSRF protection is enabled server-side
 });
 
+// Response interceptor to handle responses and errors
 publicAxios.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    // If the error response status is 401 (Unauthorized) and the request has not been retried yet,
-    // set the _retry flag to true to ensure the request is only retried once
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+      // Handle token refresh logic if necessary
     }
-    return Promise.reject(error); // Ensure the promise is rejected to handle errors properly.
+    return Promise.reject(error); // Ensure the promise is rejected to handle errors properly
   }
 );
 
-export { publicAxios};
+export { publicAxios };

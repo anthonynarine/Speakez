@@ -13,7 +13,8 @@ import Avatar from "@mui/material/Avatar";
 import { Link } from "react-router-dom";
 import { useCrud } from "../../hooks/useCrud";
 
-const MEDIA_URL = process.env.MEDIA_URL;
+const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+
 
 const PopularChannels = ({ open }) => {
   const {  error, isLoading, serverData, fetchData } = useCrud();
@@ -23,7 +24,8 @@ const PopularChannels = ({ open }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Servers", serverData);
+    console.log("PopularChannels Data", serverData);
+    console.log("Media URL", MEDIA_URL)
   }, [serverData]);
 
   return (
@@ -41,7 +43,7 @@ const PopularChannels = ({ open }) => {
               to={`/server/${server.id}`}
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <ListItemButton sx={{ minHeight: 0 }}>
+              <ListItemButton sx={{ minHeight: 0, justifyContent: "center" }}>
                 <ListItemIcon sx={{ minWidth: 0, justifyContent: "center" }}>
                   <ListItemAvatar sx={{ minWidth: "50px" }}>
                     <Avatar alt="Server Icon" src={`${MEDIA_URL}${server.icon}`} />
@@ -65,12 +67,16 @@ const PopularChannels = ({ open }) => {
                   secondary={
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 500, lineHeight: 1.2, color: "textSecondary" }}
+                      sx={{ fontWeight: 400, lineHeight: 1.2, color: "textSecondary" }}
                     >
                       {server.category}
                     </Typography>
                   }
-                  sx={{ opacity: open ? 1 : 0 }}
+                  sx={{ 
+                    opacity: open ? 1 : 0,
+                    display: "flex",
+                    flexDirection: "column"
+                  }}
                   primaryTypographyProps={{
                     sx: {
                       textOverflow: "ellipsis",
