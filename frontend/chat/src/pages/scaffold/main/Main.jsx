@@ -22,11 +22,11 @@ const Main = function ({ children }) {
         overflow: "hidden",
       }}
     >
-      {[...Array(40)].map((_, i) => (
+      {/* {[...Array(40)].map((_, i) => (
         <Typography key={i} paragraph>
           {i + 1}
         </Typography>
-      ))}
+      ))} */}
       {children}
     </Box>
   );

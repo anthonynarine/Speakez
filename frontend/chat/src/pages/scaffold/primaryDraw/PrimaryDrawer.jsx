@@ -86,6 +86,7 @@ const PrimaryDraw = function ({ children }) {
           flex: 1,
           overflowY: 'auto',
           padding: theme.spacing(2),
+          paddingTop: "0",
         }}
       >
         {/* {[...Array(40)].map((_, i) => (

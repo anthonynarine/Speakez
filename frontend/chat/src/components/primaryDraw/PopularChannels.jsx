@@ -31,7 +31,7 @@ const PopularChannels = ({ open }) => {
   return (
     <>
 
-      <List>
+      <List sx={{paddingTop: "0"}}>
         {serverData.map((server) => (
           <ListItem
             key={server.id}
