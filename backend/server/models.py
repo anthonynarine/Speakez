@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.dispatch import receiver
 
 from .utils.scale_image import scale_down_image
+from .utils.resize_image import resize_and_fit_image
 from .validators.image_validators import validate_icon_image_size, validate_image_file_extension
 from .utils.image_path import category_icon_upload_path, server_banner_img_upload_path, server_icon_upload_path
 
@@ -119,6 +120,7 @@ class Server(models.Model):
         null=True,
         validators=[validate_image_file_extension],
     )
+    
     icon = models.ImageField(
         
         upload_to=server_icon_upload_path,
@@ -164,13 +166,11 @@ class Server(models.Model):
             if existing.banner_img != self.banner_img:
                 existing.banner_img.delete(save=False)
 
-        # if self.icon:
-        #     scale_down_image(self.icon.path)
-        # if self.banner_img:
-        #     scale_down_image(self.banner_img.path)
-
         super(Server, self).save(*args, **kwargs)
 
+        if self.banner_img:
+            scale_down_image(self.banner_img.path)
+            
     def __str__(self):
         return self.name
 

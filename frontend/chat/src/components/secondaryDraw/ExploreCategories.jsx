@@ -46,7 +46,7 @@ function ExploreCategories() {
           backgroundColor: theme.palette.background.default,
         }}
       >
-        <Typography variant="h6" sx={{ color: "#637C5B",  }}>Explore</Typography>
+        <Typography variant="h6" sx={{ color: "#637C5B",  }}>Category</Typography>
       </Box>
       <List sx={{ py: 0 }}>
         {serverData.map((category) => (

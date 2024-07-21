@@ -24,7 +24,7 @@ function ExploreServers() {
   const url = categoryName
     ? `/server/select/?category=${categoryName}`
     : "/server/select";
-  const { serverData, fetchData } = useCrud([], url);
+  const { serverData, fetchData } = useCrud(url);
 
   useEffect(() => {
     fetchData();
@@ -103,7 +103,7 @@ function ExploreServers() {
                           : "http://source.unsplash.com/random/"
                       }
                       alt="random"
-                      sx={{ display: { xs: "none", sm: "block" } }}
+                      sx={{ display: { xs: "none", sm: "block" },  width: '100%', height: 150, objectFit: 'cover' }}
                     />
                     <CardContent
                       sx={{
@@ -149,6 +149,11 @@ function ExploreServers() {
                                 {server.category}
                               </Typography>
                             }
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "flex-start",
+                            }}
                           />
                         </ListItem>
                       </List>

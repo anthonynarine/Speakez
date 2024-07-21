@@ -18,8 +18,12 @@ const PrimaryDraw = function ({ children }) {
   // Check if the screen is below 600px (sm breakpoint)
   const below600sm = Boolean(useMediaQuery("(max-width:599px)"));
 
+
   // State to control the drawer's open/close state
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => {
+    // Initialize state based on screen size
+    return !below600sm;
+  });
 
   // Effect to update the drawer's open state when the screen size changes
   useEffect(() => {

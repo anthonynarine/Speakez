@@ -1,10 +1,12 @@
 // src/pages/scaffold/primaryAppBar/PrimaryAppBar.js
 
+import React from 'react'; // Added import for React
 import { AppBar, Toolbar, Typography, Box, IconButton, Drawer } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useResponsiveDrawer } from "./hooks/useResponsiveDrawer";
+import ExploreCategories from "../../../components/secondaryDraw/ExploreCategories";
 
 /**
  * PrimaryAppBar component renders the main application navbar with a responsive drawer functionality.
@@ -16,9 +18,19 @@ import { useResponsiveDrawer } from "./hooks/useResponsiveDrawer";
  * @returns {JSX.Element} The rendered PrimaryAppBar component.
  */
 const PrimaryAppBar = () => {
-  
   const { isDrawerOpen, toggleDrawer } = useResponsiveDrawer();
   const theme = useTheme();
+
+  const list = () => (
+    <Box
+      sx={{ paddingTop: `${theme.primaryAppBar.height}px`, minWidth: 200 }}
+      role="presentation"
+      onClick={() => toggleDrawer(false)} 
+      onKeyDown={() => toggleDrawer(false)} 
+    >
+      <ExploreCategories />
+    </Box>
+  );
 
   return (
     <AppBar
@@ -41,7 +53,7 @@ const PrimaryAppBar = () => {
             color="inherit"
             aria-label="open drawer"
             edge="start"
-            onClick={() => toggleDrawer(true)}
+            onClick={() => toggleDrawer(true)} 
             sx={{ mr: 1 }}
           >
             <MenuIcon />
@@ -50,13 +62,8 @@ const PrimaryAppBar = () => {
         {/* ============================ End of Menu Icon for Small Screens ============================ */}
 
         {/* ============================ Drawer ============================ */}
-        <Drawer anchor="left" open={isDrawerOpen} onClose={() => toggleDrawer(false)}>
-          {/* Drawer Content */}
-          {[...Array(100)].map((_, i) => (
-            <Typography key={i} paragraph>
-              {i + 1}
-            </Typography>
-          ))}
+        <Drawer anchor="left" open={isDrawerOpen} onClose={() => toggleDrawer(false)}> 
+        {list()}
         </Drawer>
         {/* ============================ End of Drawer ============================ */}
 
@@ -66,7 +73,7 @@ const PrimaryAppBar = () => {
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { fontWeight: 700, letterSpacing: "4px" } }}
+            sx={{ fontWeight: 700, letterSpacing: "4px" }} 
           >
             SpeakEz
           </Typography>
