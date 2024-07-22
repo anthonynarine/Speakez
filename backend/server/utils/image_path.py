@@ -50,3 +50,12 @@ def server_banner_img_upload_path(instance, filename):
         str: The upload path for the file.
     """
     return f"server/{instance.id}/server_banners/{filename}"
+
+def default_server_banner_img_path():
+    """
+    Returns the path to the default icon image.
+    """
+    return "server/defaults/banner_image/default_banner.png"
+
+def default_server_icon_path():
+    return "server/defautls/icon_image/default_icon.png"
