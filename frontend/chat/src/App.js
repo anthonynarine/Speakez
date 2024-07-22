@@ -3,23 +3,21 @@ import Homepage from "./pages/Homepage";
 import ExplorePage from "./pages/ExplorePage";
 import "./theme/main.css";
 import { Box } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
-import { createMuiTheme } from "./theme/theme";
+import ToggleColorMode from "./theme/color/ToggleColorMode";
 
 
 function App() {
-  // Create the theme
-  const theme = createMuiTheme();
+
 
   return (
-    <ThemeProvider theme={theme}>
+    <ToggleColorMode>
       <Box sx={{ display: "flex" }}>
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/explore/:categoryName" element={<ExplorePage />} />
         </Routes>
       </Box>
-    </ThemeProvider>
+    </ToggleColorMode>
   );
 }
 

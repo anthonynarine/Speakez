@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useResponsiveDrawer } from "./hooks/useResponsiveDrawer";
 import ExploreCategories from "../../../components/secondaryDraw/ExploreCategories";
+import AccountButton from './AccountButton';
 
 /**
  * PrimaryAppBar component renders the main application navbar with a responsive drawer functionality.
@@ -79,6 +80,8 @@ const PrimaryAppBar = () => {
           </Typography>
         </Link>
         {/* ============================ End of App Title ============================ */}
+        <Box sx={{ flexGrow: 1}}></Box>
+        <AccountButton/>
       </Toolbar>
     </AppBar>
   );
