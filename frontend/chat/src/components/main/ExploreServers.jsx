@@ -80,7 +80,7 @@ function ExploreServers() {
         <Grid container spacing={{ xs: 0, sm: 2 }}>
           {serverData.map((server) => {
             return (
-              <Grid item key={server.id} xs={12} sm={6} md={4} lg={3}>
+              <Grid item key={server.id} xs={12} sm={6} md={4} lg={4} xl={4}>
                 <Card
                   sx={{
                     height: "100%",
@@ -89,6 +89,7 @@ function ExploreServers() {
                     boxShadow: "none",
                     backgroundImage: "none",
                     borderRadius: 0,
+                    justifyContent:"center"
                   }}
                 >
                   <Link
@@ -103,7 +104,11 @@ function ExploreServers() {
                           : "http://source.unsplash.com/random/"
                       }
                       alt="random"
-                      sx={{ display: { xs: "none", sm: "block" },  width: '100%', height: 150, objectFit: 'cover' }}
+                      sx={{
+                        display: { xs: "none", sm: "block" },
+                        width: '100%',
+                        // height: 150,
+                        objectFit: 'cover' }}
                     />
                     <CardContent
                       sx={{
