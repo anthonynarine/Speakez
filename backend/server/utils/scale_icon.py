@@ -3,8 +3,6 @@ from PIL import Image, ImageOps, ImageSequence
 import os
 from django.conf import settings
 
-from backend.server.utils import image_path
-
 # Logging config
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -69,6 +67,11 @@ def scale_down_icon(image_path, max_size=(70, 70)):
             # Calculate the position to paste the resized image onto the blank image
             offset = ((max_size[0] - new_size[0]) // 2, (max_size[1] - new_size[1]) // 2)
             background.paste(icon_img, offset)
+
+            # Convert RGBA to RGB before saving if necessary
+            if background.mode == 'RGBA':
+                background = background.convert('RGB')
+
             # Save the new image back to the same path
             background.save(image_path)
         logger.info(f"Scaled image from {original_size} to {new_size} and saved at {image_path}")

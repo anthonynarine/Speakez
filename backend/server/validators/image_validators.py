@@ -7,13 +7,24 @@ import os
 # it does not modify the image or path to the image. it reads to acces the dimenstions
 
 def validate_icon_image_size(image):
+    """
+    Validates that the uploaded image does not exceed the maximum allowed dimensions of 70x70 pixels.
+    
+    Args:
+        image (InMemoryUploadedFile): The uploaded image file.
+    
+    Raises:
+        ValidationError: If the image exceeds the maximum allowed dimensions.
+    """
     if image:
-        with Image.open(image) as img:
-            if img.width > 70 or img.height > 70:
-                raise ValidationError(
-                    f"The maximum allowed dimensions for the image are 70x70 - size of image you uploaded {img.size} "
-                )
-                
+        try:
+            with Image.open(image) as img:
+                if img.width > 70 or img.height > 70:
+                    raise ValidationError(
+                        f"The maximum allowed dimensions for the image are 70x70 - size of image you uploaded {img.size}"
+                    )
+        except Exception as e:
+            raise ValidationError(f"Invalid image file: {e}")
                 
 def validate_image_file_extension(value):
     """

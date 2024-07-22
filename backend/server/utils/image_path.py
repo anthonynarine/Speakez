@@ -24,6 +24,9 @@ def category_icon_upload_path(instance, filename):
     # "category/1/category_icon/my_file.png".
     return f"category/{instance.id}/category_icon/{filename}"
 
+def default_category_icon():
+    return "category/defaults/icon_image/category_default.png"
+
 def server_icon_upload_path(instance, filename):
     """
     Determines the upload path for channel icons.

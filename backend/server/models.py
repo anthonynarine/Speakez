@@ -6,9 +6,15 @@ from django.shortcuts import get_object_or_404
 from django.dispatch import receiver
 
 from .utils.scale_image import scale_down_image
-from .utils.resize_image import resize_and_fit_image
+from .utils.scale_icon import scale_down_icon
 from .validators.image_validators import validate_icon_image_size, validate_image_file_extension
-from .utils.image_path import category_icon_upload_path, server_banner_img_upload_path, server_icon_upload_path
+from .utils.image_path import (
+    category_icon_upload_path,
+    default_category_icon,
+    server_banner_img_upload_path,
+    server_icon_upload_path,
+    default_server_banner_img_path
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +30,7 @@ class Category(models.Model):
         null=True,
         blank=True,
         validators=[validate_icon_image_size, validate_image_file_extension],
+        default=default_category_icon
     )
 
     def save(self, *args, **kwargs):
@@ -118,7 +125,8 @@ class Server(models.Model):
         upload_to=server_banner_img_upload_path,
         blank=True,
         null=True,
-        validators=[validate_image_file_extension],
+        validators=[ validate_image_file_extension],
+        default=default_server_banner_img_path
     )
     
     icon = models.ImageField(
@@ -126,7 +134,7 @@ class Server(models.Model):
         upload_to=server_icon_upload_path,
         blank=True,
         null=True,
-        validators=[validate_icon_image_size, validate_image_file_extension],
+        validators=[validate_image_file_extension],
     )
 
     def save(self, *args, **kwargs):
@@ -170,6 +178,11 @@ class Server(models.Model):
 
         if self.banner_img:
             scale_down_image(self.banner_img.path)
+            
+        if self.icon:
+            scale_down_icon(self.icon.path)
+            # Re-validate the icon size
+            validate_icon_image_size(self.icon)
             
     def __str__(self):
         return self.name
