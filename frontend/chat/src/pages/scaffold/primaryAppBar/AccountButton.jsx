@@ -19,16 +19,13 @@ export default function AccountButton() {
   // It's true if anchorElement is not null, and false otherwise.
   const isMenuOpen = Boolean(anchorElement);
 
-  // handleProfileMenuOpen is a function that's called when the user
-  // clicks the button to open the menu. The click event is passed as
+  // handleToggleMenu is a function that's called when the user
+  // clicks the button to toggle the menu. The click event is passed as
   // an argument to this function.
-  const handleProfileMenuOpen = (event) => {
-    // The clicked element is set as the anchorElement.
-    setAnchorElement(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorElement(null);
+  const handleToggleMenu = (event) => {
+    // If the menu is already open, close it by setting anchorElement to null.
+    // If the menu is closed, open it by setting the clicked element as the anchorElement.
+    setAnchorElement(isMenuOpen ? null : event.currentTarget);
   };
 
   // Menu to be rendered when the button is clicked.
@@ -40,13 +37,13 @@ export default function AccountButton() {
       transformOrigin={{ vertical: 6, horizontal: "right" }}
       keepMounted
       open={isMenuOpen}
-      onClose={handleMenuClose}
+      onClose={handleToggleMenu}
     >
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={handleToggleMenu}>
         <AccountCircle />
         Profile
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={handleToggleMenu}>
         <Brightness4Icon />
         <ColorModeSwitch />
       </MenuItem>
@@ -60,7 +57,7 @@ export default function AccountButton() {
         aria-label="account of current user"
         aria-controls="primary-search-account-menu"
         aria-haspopup="true"
-        onClick={handleProfileMenuOpen}
+        onClick={handleToggleMenu}
         color="inherit"
       >
         <AccountCircle />
