@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # Local
     "server",
     "account", 
+    "chatapp", 
 ]
 
 MIDDLEWARE = [

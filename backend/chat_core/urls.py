@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 
+
 #drf-spectacular
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
@@ -17,6 +18,10 @@ urlpatterns = [
     # Include server app URLs
     path("api/", include("server.urls")),
 ] 
+
+websocket_urlPatterns = [
+    path(),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
