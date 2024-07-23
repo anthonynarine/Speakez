@@ -170,3 +170,29 @@ CSRF_TRUSTED_ORIGINS = [
 
     # Additional trusted origins...
 ]
+
+# Check if the application is running in development mode (DEBUG=True)
+if DEBUG:
+    # Use In-Memory Channel Layer for development and testing
+    # This backend keeps all messages in memory and is suitable for local development
+    # It is simple to use and requires no additional setup beyond this configuration
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
+else:
+    # Use Redis Channel Layer for production
+    # This backend uses Redis as a message broker, suitable for handling high concurrency
+    # and distributing messages across multiple processes or machines
+    CHANNEL_LAYERS = {
+        "default": {
+            # Specify the Redis Channel Layer backend
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                # Configure the Redis host and port
+                # Replace "127.0.0.1" with the actual Redis server address if it's not running locally
+                "hosts": [("127.0.0.1", 6379)],
+            },
+        },
+    }
