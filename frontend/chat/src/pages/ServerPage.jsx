@@ -1,28 +1,26 @@
 import { Box, CssBaseline } from "@mui/material";
+// Structural
 import PrimaryAppBar from "../pages/scaffold/primaryAppBar/PrimaryAppBar";
 import PrimaryDraw from "./scaffold/primaryDraw/PrimaryDrawer";
 import SecondaryDraw from "./scaffold/secondaryDraw/SecondaryDraw";
 import Main from "./scaffold/main/Main";
-import PopularChannels from "../components/primaryDraw/PopularChannels";
-import ExploreCategories from "../components/secondaryDraw/ExploreCategories";
-import ExploreServers from "../components/main/ExploreServers";
+import MessageInterface from "../components/main/messageInterface/MessageInterface";
+import ServerChannels from "./scaffold/secondaryDraw/ServerChannels";
 
-const Homepage = () => {
+const ServerPage = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <PrimaryAppBar />
-      <PrimaryDraw>
-        <PopularChannels open={false} />
-      </PrimaryDraw>
+      <PrimaryDraw></PrimaryDraw>
       <SecondaryDraw>
-        <ExploreCategories />
+        <ServerChannels />
       </SecondaryDraw>
       <Main>
-        <ExploreServers />
+        <MessageInterface />
       </Main>
     </Box>
   );
 };
 
-export default Homepage;
+export default ServerPage;
