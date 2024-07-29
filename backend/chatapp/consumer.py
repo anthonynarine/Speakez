@@ -1,6 +1,9 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 
+from .models import Conversation, Message
+from django.contrib.auth import get_user_model
+
 class ChatAppConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
