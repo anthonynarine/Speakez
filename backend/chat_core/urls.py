@@ -1,22 +1,26 @@
+# chat_core/urls.py
 
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
+from chatapp.consumer import ChatAppConsumer
 
-#drf-spectacular
+# drf-spectacular
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+# Standard HTTP URL patterns
 urlpatterns = [
     path("admin/", admin.site.urls),
-    
-    # drf-spectacular urls
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    
-    # Include server app URLs
     path("api/", include("server.urls")),
-] 
+]
+
+# WebSocket URL patterns
+websocket_urlpatterns = [
+    path("ws/test", ChatAppConsumer.as_asgi()),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

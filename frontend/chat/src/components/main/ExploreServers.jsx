@@ -24,7 +24,7 @@ function ExploreServers() {
   const url = categoryName
     ? `/server/select/?category=${categoryName}`
     : "/server/select";
-  const { serverData, fetchData } = useCrud(url);
+  const { serverData, fetchData } = useCrud([], url);
 
   useEffect(() => {
     fetchData();

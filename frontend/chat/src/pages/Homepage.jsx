@@ -5,7 +5,6 @@ import SecondaryDraw from "./scaffold/secondaryDraw/SecondaryDraw";
 import Main from "./scaffold/main/Main";
 import PopularChannels from "../components/primaryDraw/PopularChannels";
 import ExploreCategories from "../components/secondaryDraw/ExploreCategories";
-import ExplorePage from "./ExplorePage";
 import ExploreServers from "../components/main/ExploreServers";
 
 const Homepage = () => {

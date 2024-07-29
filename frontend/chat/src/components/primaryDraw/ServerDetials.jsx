@@ -3,35 +3,23 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Box,
   Typography,
   ListItemButton,
 } from "@mui/material";
-
-import { useEffect } from "react";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { Link } from "react-router-dom";
-import { useCrud } from "../../hooks/useCrud";
+import { useServerByIdContext } from "../../pages/ServerPage";
 
 const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
-
-const PopularChannels = ({ open }) => {
-  const {  error, isLoading, serverData, fetchData } = useCrud([],"server/select/");
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("PopularChannels Data", serverData);
-  //   console.log("Media URL", MEDIA_URL)
-  // }, [serverData]);
+const ServerDetails = ({ open }) => {
+  const { serverData } = useServerByIdContext();
 
   return (
     <>
-
-      <List sx={{paddingTop: "0"}}>
+      <List>
         {serverData.map((server) => (
           <ListItem
             key={server.id}
@@ -44,7 +32,7 @@ const PopularChannels = ({ open }) => {
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <ListItemButton sx={{ minHeight: 0, justifyContent: "center" }}>
-                <ListItemIcon sx={{ minWidth: 0, justifyContent: "center" }}>
+                <ListItemIcon sx={{ minHeight: 0, justifyContent: "center" }}>
                   <ListItemAvatar sx={{ minWidth: "50px" }}>
                     <Avatar alt="Server Icon" src={`${MEDIA_URL}${server.icon}`} />
                   </ListItemAvatar>
@@ -72,11 +60,10 @@ const PopularChannels = ({ open }) => {
                       {server.category}
                     </Typography>
                   }
-                  sx={{ 
-                    opacity: open ? 1 : 0,
+                  sx={{ opacity: open ? 1 : 0,
                     display: "flex",
                     flexDirection: "column"
-                  }}
+                   }}
                   primaryTypographyProps={{
                     sx: {
                       textOverflow: "ellipsis",
@@ -94,4 +81,4 @@ const PopularChannels = ({ open }) => {
   );
 };
 
-export default PopularChannels;
+export default ServerDetails;
