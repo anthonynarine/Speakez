@@ -100,8 +100,8 @@ class ServerListViewSet(viewsets.ViewSet):
         )
 
         # If user-specific or server-specific requests are made, check authentication
-        if (by_user or by_serverid) and not request.user.is_authenticated:
-            raise AuthenticationFailed(detail="Authentication required for this request.")
+        # if (by_user or by_serverid) and not request.user.is_authenticated:
+        #     raise AuthenticationFailed(detail="Authentication required for this request.")
 
         # If by_user is true, filter the queryset by the user
         if by_user:

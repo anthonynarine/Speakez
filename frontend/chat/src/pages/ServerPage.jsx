@@ -12,6 +12,7 @@ import SecondaryDraw from "./scaffold/secondaryDraw/SecondaryDraw";
 import Main from "./scaffold/main/Main";
 import MessageInterface from "../components/main/messageInterface/MessageInterface";
 import ServerChannels from "../components/secondaryDraw/ServerChannels";
+import ServerDetails from "../components/primaryDraw/ServerDetials";
 
 // Hook imports
 import useCrud from "../hooks/useCrud";
@@ -67,7 +68,9 @@ const ServerPage = () => {
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <PrimaryAppBar />
-        <PrimaryDraw></PrimaryDraw>
+        <PrimaryDraw>
+          <ServerDetails />
+        </PrimaryDraw>
         <SecondaryDraw>
           <ServerChannels />
         </SecondaryDraw>
