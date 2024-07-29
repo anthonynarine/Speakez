@@ -16,7 +16,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/explore/:categoryName" element={<ExplorePage />} />
-          <Route path="/server" element={<ServerPage />} />
+          <Route path="/server/:serverId/channelId?" element={<ServerPage />} />
+           {/* the ? makes it optional without it will expect a property */}
         </Routes>
       </Box>
     </ToggleColorMode>

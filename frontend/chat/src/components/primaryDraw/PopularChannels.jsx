@@ -17,7 +17,7 @@ const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
 
 const PopularChannels = ({ open }) => {
-  const {  error, isLoading, serverData, fetchData } = useCrud("server/select/");
+  const {  error, isLoading, serverData, fetchData } = useCrud([],"server/select/");
 
   useEffect(() => {
     fetchData();

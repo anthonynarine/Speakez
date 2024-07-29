@@ -10,15 +10,32 @@ import {
   import { useEffect } from "react";
   import { Link } from "react-router-dom";
   import { useTheme } from "@mui/material/styles";
+  import { useServerByIdContext } from "../../pages/ServerPage";
+
+  /**
+ * ServerChannels component
+ *
+ * This component displays a list of channels for the current server.
+ * It fetches the server data from the context and displays the channels.
+ *
+ * @component
+ * @returns {JSX.Element} The ServerChannels component
+ */
   
-  function ServerChannels({ data }) {
+  function ServerChannels() {
     const theme = useTheme();
-    const server_name = data?.[0]?.name ?? "Server";
+    
+    // Access serverData form context
+    const { serverData } = useServerByIdContext();
+
+    // Get the server name, default to "Server" if not available
+    const server_name = serverData?.[0]?.name ?? "Server";
+    // const server_name = serverData && serverData.length > 0 && serverData[0].name ? serverData[0].name : "Server";
   
     //....FOR TESTING
     useEffect(() => {
-      console.log("Channel_server", data);
-    }, [data]);
+      console.log("Channel_server", serverData);
+    }, [serverData]);
   
     return (
       <>
@@ -42,7 +59,7 @@ import {
           </Typography>
         </Box>
         <List sx={{ py: 0 }}>
-          {data.flatMap((server) =>
+          {serverData.map((server) =>
             server.channel_server.map((channel) => (
               <ListItem
                 key={channel.id}

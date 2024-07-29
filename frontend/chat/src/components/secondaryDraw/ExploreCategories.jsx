@@ -21,16 +21,16 @@ function ExploreCategories() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
-  const { serverData, error, isLoading, fetchData } = useCrud("/server/category/");
+  const { serverData, error, isLoading, fetchData } = useCrud([], "/server/category/");
 
   useEffect(() => {
     fetchData();
   }, []);
 
   //....FOR TESTING
-  useEffect(() => {
-    console.log("Category", serverData);
-  }, [serverData]);
+  // useEffect(() => {
+  //   console.log("Category", serverData);
+  // }, [serverData]);
 
   return (
     <>
