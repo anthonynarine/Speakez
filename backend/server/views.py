@@ -4,9 +4,9 @@ import logging
 
 from django.shortcuts import render
 import drf_spectacular
-from rest_framework.exceptions import ValidationError, AuthenticationFailed
+from rest_framework.exceptions import ValidationError, AuthenticationFailed, NotFound
 from .models import Category, Server
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from .serializers import ServerSerializer, CategorySerializer
 from rest_framework.response import Response
@@ -21,11 +21,32 @@ logger = logging.getLogger(__name__)
 
 class CategoryListViewSet(viewsets.ViewSet):
     queryset = Category.objects.all().order_by("-name")
+    serializer_class = CategorySerializer
     
     @extend_schema(responses=CategorySerializer)
     def list(self, request):
-        serializer = CategorySerializer(self.queryset, many=True)
-        return Response(serializer.data)
+        """
+        Handles the GET request to list all categories.
+
+        If no categories are found, raises a NotFound exception.
+        Otherwise, serializes the queryset and returns it with a 200 OK status.
+
+        Args:
+            request (Request): The request object.
+
+        Returns:
+            Response: A DRF Response object containing the serialized data and HTTP status code.
+        """
+        queryset = self.queryset
+        # Check if the queryset is empty
+        if not queryset.exists():
+            # Raise a NotFound exception if no categories are found
+            raise NotFound(detail="No categories found.")
+        
+        # Serialize the queryset to convert it to JSON format
+        serializer = CategorySerializer(queryset, many=True)
+        # Return the serialized data with a 200 OK status
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 
