@@ -1,34 +1,68 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from asgiref.sync import async_to_sync
-
-from .models import Conversation, Message
 from django.contrib.auth import get_user_model
+from .models import Conversation, Message
+
+User = get_user_model()
 
 class ChatAppConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.room_name = "testserver"
+        self.channel_id = None
+        self.user = None
+        self.room_name = None
 
     def connect(self):
         self.accept()
-        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
+
+        # Extract channel_id from the URL route parameters
+        self.channel_id = self.scope["url_route"]["kwargs"]["channelId"]
+        self.user = User.objects.get(id=1)  # For demonstration purposes; replace with actual user identification logic
+        
+        # Create a unique group name for the conversation
+        self.room_name = f"conversation_{self.channel_id}"
+        
+        # Add the channel to the group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_name,
+            self.channel_name
+        )
 
     def receive_json(self, content, **kwargs):
-        # Ensure the message content is processed correctly
-        message = content.get('message')
-        if message:
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_name,
-                {"type": "chat.message", "message": message},
-            )
+        message = content["message"]
+        sender = self.user
+        
+        # Ensure the conversation exists, create if it doesn't
+        conversation = Conversation.objects.get_or_create(channel_id=self.channel_id)[0]
+        
+        # Create a new message in the conversation
+        new_message = Message.objects.create(
+            conversation=conversation,
+            sender=sender,
+            content=message
+        )
+        
+        # Broadcast the message to the group
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_name,
+            {
+                "type": "chat_message",
+                "message": {
+                    "id": new_message.id,
+                    "sender": new_message.sender.username,
+                    "content": new_message.content,
+                    "timestamp": new_message.timestamp.isoformat(),
+                },
+            }
+        )
 
     def chat_message(self, event):
-        # Ensure the outgoing message is structured correctly
-        message = event.get('message')
+        message = event.get("message")
         if message:
-            self.send_json({
-                'message': message
-            })
+            self.send_json(message)
 
     def disconnect(self, code):
-        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
+        # Leave the conversation group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_name, self.channel_name
+        )
