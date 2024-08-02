@@ -1,11 +1,14 @@
 import { useState } from "react";
 import useWebSocket from "react-use-websocket";
+import { useParams } from "react-router";
 
-const socketURL = "ws://localhost:8000/ws/test";
 
 const MessageInterface = () => {
   const [newMessage, setNewMessage] = useState([]);
   const [message, setMessage] = useState("");
+  const { serverId, channelId } = useParams();
+  
+  const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}`: null
 
   const { sendJsonMessage } = useWebSocket(socketURL, {
     onOpen: () => {

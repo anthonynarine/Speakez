@@ -21,120 +21,34 @@ logger = logging.getLogger(__name__)
 class Category(models.Model):
     """
     Category that can be assigned to servers in the system.
+    
+    This model represents a category which can group servers together under a common theme.
+    
+    Attributes:
+        name (str): The name of the category.
+        description (str): A brief description of the category.
+        icon (FileField): An optional icon for the category.
     """
 
-    name = models.CharField(max_length=50)
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Category Name",
+        help_text="The name of the category."
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Description",
+        help_text="A brief description of the category."
+    )
     icon = models.FileField(
         upload_to=category_icon_upload_path,
         null=True,
         blank=True,
         validators=[validate_icon_image_size, validate_image_file_extension],
-        default=default_category_icon
-    )
-
-    def save(self, *args, **kwargs):
-        """
-        Overwrites the default save method to handle deletion of the old icon
-        and banner when new ones are uploaded.
-
-        First, the function checks if the instance already has an ID. The presence of an ID indicates
-        that this is an existing Channel in the database, not a new instance being created.
-        This check is crucial because we only want to attempt deletion of the previous icon and banner for
-        an existing Channel that is being updated.
-
-        If the Channel is already in the database, the function fetches the current Channel
-        instance from the database using Django's get_object_or_404 function. This function will
-        return the Channel object if it exists, and if it doesn't, it will raise a Http404 exception.
-
-        The function then compares the existing icon and banner with the new ones. If they differ, it means a
-        new icon or banner has been uploaded. When a new icon or banner is uploaded, the function deletes the old
-        icon or banner file from the filesystem. It's important to note that the `delete` method of a
-        FileField takes an optional `save` argument. By default, `save` is `True`, and it will save
-        the model after deleting the associated file. In this case, however, we pass `save=False`
-        to the `delete` method to avoid an unnecessary additional database write, as we are about
-        to save the model ourselves in the next step.
-
-        Finally, the original save method is called through the use of `super()` to save the
-        changes (including the new icon and banner) to the database.
-
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments."""
-        if self.id:
-            existing_category = get_object_or_404(Category, id=self.id)
-            if existing_category.icon != self.icon:
-                logger.debug(f'Deleting old icon for category {self.name}')
-                existing_category.icon.delete(save=False)
-        self.name = self.name.lower()
-
-        # if self.icon:
-        #     scale_down_image(self.icon.path)
-
-        super(Category, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-    @receiver(models.signals.pre_delete, sender="server.Category")
-    def category_delete_files(sender, instance, **kwargs):
-        """
-        Receiver for a `pre_delete` signal on the `Category` model.
-
-        This function is triggered right before a `Category` instance is deleted. Its main role is to
-        delete the associated icon file from the file system, if one exists.
-
-        The function checks if the `Category` instance has an associated icon by trying to access
-        the `icon` attribute. If the `icon` attribute has a value (i.e., a file), it calls the `delete`
-        method on it, which deletes the file from the file system.
-
-        The `delete` method takes an optional `save` argument which defaults to `True`. However, since
-        we are in the process of deleting the `Category` instance from the database, there is no need
-        to save it. Hence, we pass `save=False` to avoid an unnecessary database operation.
-
-        Args:
-            sender (Model): The model class that sent the signal.
-            instance (Model instance): The actual instance being deleted.
-            **kwargs: Arbitrary keyword arguments.
-        """
-        if instance.icon:
-            logger.debug(f'Deleting icon for category "{instance.name}"')
-            instance.icon.delete(save=False)
-
-    def __str__(self):
-        return self.name
-    
-    
-class Server(models.Model):
-    """
-    Server in the system that belongs to a specific category.
-    """
-
-    name = models.CharField(max_length=50)
-    # Server can have only one owner
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="server_owner"
-    )
-    category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name="server_category"
-    )
-    description = models.CharField(max_length=250, blank=True, null=True)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL)
-    banner_img = models.ImageField(
-        upload_to=server_banner_img_upload_path,
-        blank=True,
-        null=True,
-        validators=[ validate_image_file_extension],
-        default=default_server_banner_img_path
-    )
-    
-    icon = models.ImageField(
-        
-        upload_to=server_icon_upload_path,
-        blank=True,
-        null=True,
-        validators=[validate_image_file_extension],
+        default=default_category_icon,
+        verbose_name="Icon",
+        help_text="An optional icon for the category."
     )
 
     def save(self, *args, **kwargs):
@@ -166,7 +80,140 @@ class Server(models.Model):
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
         """
+        if self.id:
+            existing_category = get_object_or_404(Category, id=self.id)
+            if existing_category.icon != self.icon:
+                logger.debug(f'Deleting old icon for category {self.name}')
+                existing_category.icon.delete(save=False)
 
+        self.name = self.name.lower()
+
+        super(Category, self).save(*args, **kwargs)
+        logger.info(f'Saved category {self.name} (ID: {self.id})')
+
+    def __str__(self):
+        return self.name
+
+    @receiver(models.signals.pre_delete, sender=Category)
+    def category_delete_files(sender, instance, **kwargs):
+        """
+        Receiver for a `pre_delete` signal on the `Category` model.
+
+        This function is triggered right before a `Category` instance is deleted. Its main role is to
+        delete the associated icon file from the file system, if one exists.
+
+        The function checks if the `Category` instance has an associated icon by trying to access
+        the `icon` attribute. If the `icon` attribute has a value (i.e., a file), it calls the `delete`
+        method on it, which deletes the file from the file system.
+
+        The `delete` method takes an optional `save` argument which defaults to `True`. However, since
+        we are in the process of deleting the `Category` instance from the database, there is no need
+        to save it. Hence, we pass `save=False` to avoid an unnecessary database operation.
+
+        Args:
+            sender (Model): The model class that sent the signal.
+            instance (Model instance): The actual instance being deleted.
+            **kwargs: Arbitrary keyword arguments.
+        """
+        if instance.icon:
+            logger.debug(f'Deleting icon for category "{instance.name}"')
+            instance.icon.delete(save=False)
+    
+    
+class Server(models.Model):
+    """
+    Server in the system that belongs to a specific category.
+    
+    This model represents a server, which can be thought of as a container for various channels.
+    
+    Attributes:
+        name (str): The name of the server.
+        owner (User): The user who owns the server.
+        category (Category): The category to which this server belongs.
+        description (str): A brief description of the server.
+        members (ManyToMany): The users who are members of this server.
+        banner_img (ImageField): An optional banner image for the server.
+        icon (ImageField): An optional icon for the server.
+    """
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Server Name",
+        help_text="The name of the server."
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="server_owner",
+        verbose_name="Server Owner",
+        help_text="The user who owns the server."
+    )
+    category = models.ForeignKey(
+        "Category",
+        on_delete=models.CASCADE,
+        related_name="server_category",
+        verbose_name="Category",
+        help_text="The category to which this server belongs."
+    )
+    description = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        verbose_name="Description",
+        help_text="A brief description of the server."
+    )
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name="Members",
+        help_text="The users who are members of this server."
+    )
+    banner_img = models.ImageField(
+        upload_to=server_banner_img_upload_path,
+        blank=True,
+        null=True,
+        validators=[validate_image_file_extension],
+        default=default_server_banner_img_path,
+        verbose_name="Banner Image",
+        help_text="An optional banner image for the server."
+    )
+    icon = models.ImageField(
+        upload_to=server_icon_upload_path,
+        blank=True,
+        null=True,
+        validators=[validate_image_file_extension],
+        verbose_name="Icon",
+        help_text="An optional icon for the server."
+    )
+
+    def save(self, *args, **kwargs):
+        """
+        Overwrites the default save method to handle deletion of the old icon
+        when a new one is uploaded.
+
+        First, the function checks if the instance already has an ID. The presence of an ID indicates
+        that this is an existing Category in the database, not a new instance being created.
+        This check is crucial because we only want to attempt deletion of the previous icon for
+        an existing Category that is being updated.
+
+        If the Category is already in the database, the function fetches the current Category
+        instance from the database using Django's get_object_or_404 function. This function will
+        return the Category object if it exists, and if it doesn't, it will raise a Http404 exception.
+
+        The function then compares the existing icon with the new icon. If they differ, it means a
+        new icon has been uploaded. When a new icon is uploaded, the function deletes the old
+        icon file from the filesystem. It's important to note that the `delete` method of a
+        FileField takes an optional `save` argument. By default, `save` is `True`, and it will save
+        the model after deleting the associated file. In this case, however, we pass `save=False`
+        to the `delete` method to avoid an unnecessary additional database write, as we are about
+        to save the model ourselves in the next step.
+
+        Finally, the original save method is called through the use of `super()` to save the
+        changes (including the new icon) to the database.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         if self.id:
             existing = get_object_or_404(Server, id=self.id)
             if existing.icon != self.icon:
@@ -183,10 +230,9 @@ class Server(models.Model):
             scale_down_icon(self.icon.path)
             # Re-validate the icon size
             validate_icon_image_size(self.icon)
-            
+
     def __str__(self):
         return self.name
-
 
     @receiver(models.signals.pre_delete, sender="server.Server")
     def server_delete_files(sender, instance, **kwargs):
@@ -220,29 +266,51 @@ class Server(models.Model):
             instance (Model instance): The actual instance being deleted.
             **kwargs: Arbitrary keyword arguments.
         """
-        field_names_to_check = {"icon", "banner"}
+        field_names_to_check = {"icon", "banner_img"}
         for field in instance._meta.fields:
             if field.name in field_names_to_check:
                 file = getattr(instance, field.name)
                 if file:
                     file.delete(save=False)
-
-    def __str__(self):
-        return f"{self.name} (ID: {self.id})"
+                    logger.info(f"Deleted {field.name} for server {instance.id}")
 
 
 class Channel(models.Model):
     """
     Channel within a server in the system.
+    
+    This model represents a chat room within a server.
+    
+    Attributes:
+        name (str): The name of the channel.
+        owner (User): The user who owns the channel.
+        topic (str): The topic or description of the channel.
+        server (Server): The server to which this channel belongs.
     """
 
-    name = models.CharField(max_length=50)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="channel_owner"
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Channel Name",
+        help_text="The name of the channel, which users will see and use to identify the chat room."
     )
-    topic = models.CharField(max_length=100)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="channel_owner",
+        verbose_name="Channel Owner",
+        help_text="The user who owns the channel."
+    )
+    topic = models.CharField(
+        max_length=100,
+        verbose_name="Channel Topic",
+        help_text="A short description or topic of the channel."
+    )
     server = models.ForeignKey(
-        Server, on_delete=models.CASCADE, related_name="channel_server"
+        "Server",
+        on_delete=models.CASCADE,
+        related_name="channel_server",
+        verbose_name="Server",
+        help_text="The server to which this channel belongs."
     )
 
     def __str__(self):

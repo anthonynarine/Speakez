@@ -8,9 +8,10 @@ import {
   } from "@mui/material";
   
   import { useEffect } from "react";
-  import { Link } from "react-router-dom";
+  import { Link, useParams } from "react-router-dom";
   import { useTheme } from "@mui/material/styles";
   import { useServerByIdContext } from "../../pages/ServerPage";
+
 
   /**
  * ServerChannels component
@@ -27,6 +28,7 @@ import {
     
     // Access serverData form context
     const { serverData } = useServerByIdContext();
+    const { serverId } = useParams();
 
     // Get the server name, default to "Server" if not available
     const server_name = serverData?.[0]?.name ?? "Server";
@@ -68,7 +70,7 @@ import {
                 dense={true}
               >
                 <Link
-                  to={`/server/${server.id}/${channel.id}`}
+                  to={`/server/${serverId}/${channel.id}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
                   <ListItemButton sx={{ minHeight: 48 }}>

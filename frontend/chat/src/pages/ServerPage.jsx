@@ -42,7 +42,6 @@ const useServerByIdContext = () => {
 
 
 const ServerPage = () => {
-  const navigate = useNavigate();
 
   // Extract the serverId and channelId parameters from the URL 
   const { serverId, channelId } = useParams();
