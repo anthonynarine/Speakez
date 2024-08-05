@@ -5,7 +5,7 @@ import { AppBar, Toolbar, Typography, Box, IconButton, Drawer } from "@mui/mater
 import { useTheme } from "@emotion/react";
 import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useResponsiveDrawer } from "./hooks/useResponsiveDrawer";
+import { useResponsiveDrawer } from "../../../hooks/useResponsiveDrawer";
 import ExploreCategories from "../../../components/secondaryDraw/ExploreCategories";
 import AccountButton from './AccountButton';
 
