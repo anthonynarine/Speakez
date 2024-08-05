@@ -10,13 +10,16 @@ import PrimaryAppBar from "../pages/scaffold/primaryAppBar/PrimaryAppBar";
 import PrimaryDraw from "./scaffold/primaryDraw/PrimaryDrawer";
 import SecondaryDraw from "./scaffold/secondaryDraw/SecondaryDraw";
 import Main from "./scaffold/main/Main";
-import MessageInterface from "../components/main/messageInterface/MessageInterface";
+import MessageInterface from "../components/main/messages/MessageInterface";
 import ServerChannels from "../components/secondaryDraw/ServerChannels";
 import ServerDetails from "../components/primaryDraw/ServerDetials";
 
 // Hook imports
 import useCrud from "../hooks/useCrud";
 import useValidateChannel from "../hooks/useValidateChannel";
+
+// Context import 
+import ServerByIdContext from "../context/ServerByIdContext";
 
 /**
  * ServerPage component
@@ -46,21 +49,25 @@ const ServerPage = () => {
   // Validate the channelID
   useValidateChannel(serverData, serverId, channelId);
 
+  const providerValue = { serverData, error, isLoading, serverId, channelId}
+
   
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <PrimaryAppBar />
-      <PrimaryDraw>
-        <ServerDetails serverData={serverData} isLoading={isLoading} error={error} />
-      </PrimaryDraw>
-      <SecondaryDraw>
-        <ServerChannels serverData={serverData} isLoading={isLoading} error={error} />
-      </SecondaryDraw>
-      <Main>
-        <MessageInterface />
-      </Main>
+    <ServerByIdContext.Provider value={providerValue}>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <PrimaryAppBar/>
+        <PrimaryDraw>
+          <ServerDetails/>
+        </PrimaryDraw>
+        <SecondaryDraw>
+          <ServerChannels/>
+        </SecondaryDraw>
+        <Main>
+          <MessageInterface />
+        </Main>
     </Box>
+    </ServerByIdContext.Provider>
   );
 };
 

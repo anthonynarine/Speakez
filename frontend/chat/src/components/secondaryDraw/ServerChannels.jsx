@@ -10,22 +10,21 @@ import {
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
+import { useServerByIdContext } from "../../context/ServerByIdContext";
 
 /**
  * ServerChannels component
  *
  * This component displays a list of channels for the current server.
- * It fetches the server data from the provided props and displays the channels.
+ * It fetches the server data from context and displays the channels.
  *
  * @component
- * @param {Array} serverData - Array containing server data. Each server object should have a "channel_server" property which is an array of channels.
- * @param {Boolean} isLoading - Boolean indicating whether the data is still loading.
- * @param {Object} error - Object containing error information if there was an error fetching the data.
  * @returns {JSX.Element} The ServerChannels component
  */
-function ServerChannels({ serverData, isLoading, error }) {
+function ServerChannels() {
   const theme = useTheme();
   const { serverId } = useParams();
+  const { serverData, isLoading, error } = useServerByIdContext();
 
   // Get the server name, default to "Server" if not available
   const serverName = serverData?.[0]?.name ?? "Server";
@@ -45,6 +44,7 @@ function ServerChannels({ serverData, isLoading, error }) {
 
   return (
     <>
+      {/* Server Name Header */}
       <Box
         sx={{
           height: "50px",
@@ -64,6 +64,8 @@ function ServerChannels({ serverData, isLoading, error }) {
           {serverName}
         </Typography>
       </Box>
+
+      {/* List of Channels */}
       <List sx={{ py: 0 }}>
         {serverData.map((server) =>
           server.channel_server.map((channel) => (
@@ -73,11 +75,14 @@ function ServerChannels({ serverData, isLoading, error }) {
               sx={{ display: "block", maxHeight: "40px" }}
               dense={true}
             >
+              {/* Link to Channel */}
               <Link
                 to={`/server/${serverId}/${channel.id}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
+                {/* Channel Button */}
                 <ListItemButton sx={{ minHeight: 48 }}>
+                  {/* Channel Name */}
                   <ListItemText
                     primary={
                       <Typography variant="body2" textAlign="start" paddingLeft={1}>

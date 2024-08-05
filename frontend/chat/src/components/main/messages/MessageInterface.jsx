@@ -20,6 +20,20 @@ const MessageInterface = () => {
   // Custom hook for fetching data from the API
   const { fetchData, serverData } = useCrud([], `/messages/?channel_id=${channelId}`);
 
+  // Function to handle incoming Websocket messages
+  const handleIncomingMessage = (message) => {
+    const msgData = JSON.parse(message.msgData);
+    // Create a structured object for the new message
+    const newMessage = {
+      id: msgData.id,
+      sender: msgData.sender,
+      content: msgData.new_message,
+      timestamp: msgData.timestamp,
+    };
+    // Updating the newMessages state wit the new message
+    setNewMessages((preMessages) => [...preMessages, newMessage]);
+  }
+
   // WebSocket hook to handle connection and messages
   const { sendJsonMessage } = useWebSocket(socketURL, {
     onOpen: async () => {
@@ -31,17 +45,9 @@ const MessageInterface = () => {
         console.log(error);
       }
     },
-    onClose: () => {
-      console.log("WebSocket Closed");
-    },
-    onError: (error) => {
-      console.error("WebSocket error:", error);
-    },
-    onMessage: (messageEvent) => {
-      const data = JSON.parse(messageEvent.data);
-      console.log("Message received:", data);
-      setNewMessages((prevMessages) => [...prevMessages, data]);
-    },
+    onClose: () => console.log("WebSocket connection closed."),
+    onError: () => console.log("An error occurred with the WebSocket connection."),
+    onMessage: handleIncomingMessage,
   });
 
   // Effect to update messages whenever serverData changes
