@@ -1,21 +1,39 @@
+// Material-UI imports
 import {
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box,
   Typography,
   ListItemButton,
 } from "@mui/material";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { Link } from "react-router-dom";
-import { useServerByIdContext } from "../../pages/ServerPage";
 
 const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
-const ServerDetails = ({ open }) => {
-  const { serverData } = useServerByIdContext();
+/**
+ * ServerDetails component
+ *
+ * This component displays details for the servers.
+ * It takes server data, loading, and error states as props and renders the server details accordingly.
+ *
+ * @component
+ * @param {boolean} open - Boolean indicating whether the drawer is open.
+ * @param {Array} serverData - Array containing server data.
+ * @param {boolean} isLoading - Boolean indicating whether the data is still loading.
+ * @param {Object} error - Object containing error information if there was an error fetching the data.
+ * @returns {JSX.Element} The ServerDetails component
+ */
+const ServerDetails = ({ open, serverData, isLoading, error }) => {
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <>
@@ -60,10 +78,11 @@ const ServerDetails = ({ open }) => {
                       {server.category}
                     </Typography>
                   }
-                  sx={{ opacity: open ? 1 : 0,
+                  sx={{
+                    opacity: open ? 1 : 0,
                     display: "flex",
-                    flexDirection: "column"
-                   }}
+                    flexDirection: "column",
+                  }}
                   primaryTypographyProps={{
                     sx: {
                       textOverflow: "ellipsis",

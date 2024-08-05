@@ -2,8 +2,8 @@
 import { Box, CssBaseline } from "@mui/material";
 
 // Structural imports
-import React, { createContext, useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import React, { useEffect } from "react";
+import { useParams } from "react-router";
 
 // Component imports
 import PrimaryAppBar from "../pages/scaffold/primaryAppBar/PrimaryAppBar";
@@ -18,35 +18,22 @@ import ServerDetails from "../components/primaryDraw/ServerDetials";
 import useCrud from "../hooks/useCrud";
 import useValidateChannel from "../hooks/useValidateChannel";
 
-// Create the context
-const ServerByIdContext = createContext();
-
-// Custom hook to use context 
-const useServerByIdContext = () => {
-  const context = useContext(ServerByIdContext)
-  if (context === undefined) {
-    throw new Error ("Component must be wrapped with ServerByIdProvider to access its state and functions")
-  }
-  return context;
-};
-
 /**
  * ServerPage component
  * 
  * This component represents a page displaying server data and channels. It fetches the server data based on the serverId,
- * validates the channelId, and provides the server data to its child components via context.
+ * validates the channelId, and provides the server data to its child components.
  * 
  * @component
  * @returns {JSX.Element} The ServerPage component
  */
 
-
 const ServerPage = () => {
-
   // Extract the serverId and channelId parameters from the URL 
   const { serverId, channelId } = useParams();
+  
   // bring in state and functions form useCrud hook
-  const { serverData, error, isLoading, fetchData} = useCrud(
+  const { serverData, error, isLoading, fetchData } = useCrud(
     [],
     `/server/select/?by_serverid=${serverId}`  // API endpoint to fetch server data by serverId
   );
@@ -54,32 +41,27 @@ const ServerPage = () => {
   // Fetch data once the ServerPage component loads
   useEffect(() => {
     fetchData();
-
-  }, [fetchData])
-
+  }, [fetchData]);
 
   // Validate the channelID
-  useValidateChannel(serverData, serverId, channelId)
+  useValidateChannel(serverData, serverId, channelId);
 
-
+  
   return (
-    <ServerByIdContext.Provider value={{ serverData, error, isLoading }}>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <PrimaryAppBar />
-        <PrimaryDraw>
-          <ServerDetails />
-        </PrimaryDraw>
-        <SecondaryDraw>
-          <ServerChannels />
-        </SecondaryDraw>
-        <Main>
-          <MessageInterface />
-        </Main>
-      </Box>
-    </ServerByIdContext.Provider>
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <PrimaryAppBar />
+      <PrimaryDraw>
+        <ServerDetails serverData={serverData} isLoading={isLoading} error={error} />
+      </PrimaryDraw>
+      <SecondaryDraw>
+        <ServerChannels serverData={serverData} isLoading={isLoading} error={error} />
+      </SecondaryDraw>
+      <Main>
+        <MessageInterface />
+      </Main>
+    </Box>
   );
 };
 
-export { ServerByIdContext, useServerByIdContext}
 export default ServerPage;

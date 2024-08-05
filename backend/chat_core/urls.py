@@ -14,12 +14,13 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path("api/", include("server.urls")),
+    path("api/", include("server.urls")), # Include server app URLs
+    path("api/", include("chatapp.urls")), # Include chatapp app URLs
 ]
 
 # WebSocket URL patterns
 websocket_urlpatterns = [
-    path("<str:serverId>/<str:channelId>", ChatAppConsumer.as_asgi()),
+    path("<str:serverId>/<str:channelId>/", ChatAppConsumer.as_asgi()),
 ]
 
 if settings.DEBUG:

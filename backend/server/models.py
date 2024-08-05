@@ -94,7 +94,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    @receiver(models.signals.pre_delete, sender=Category)
+    @receiver(models.signals.pre_delete, sender="server.category")
     def category_delete_files(sender, instance, **kwargs):
         """
         Receiver for a `pre_delete` signal on the `Category` model.
@@ -118,7 +118,8 @@ class Category(models.Model):
         if instance.icon:
             logger.debug(f'Deleting icon for category "{instance.name}"')
             instance.icon.delete(save=False)
-    
+            
+            
     
 class Server(models.Model):
     """
