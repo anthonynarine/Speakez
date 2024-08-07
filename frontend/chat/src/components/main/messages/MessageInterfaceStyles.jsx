@@ -2,7 +2,7 @@
 export const MessageInterfaceStyles = (theme) => ({
   messageInterfaceNoChannelSelectedBox: {
     overflow: "hidden",
-    padding: theme.spacing(0),
+    // padding: theme.spacing(0),
     height: `calc(80vh - ${theme.primaryAppBar.height}px)`,
     display: "flex",
     justifyContent: "center",
@@ -10,9 +10,9 @@ export const MessageInterfaceStyles = (theme) => ({
     // Other properties can be added here as needed
   },
   listItemAvatarBox: {
-    display: "none",
+    display: "block",
     [theme.breakpoints.up("sm")]: {
-      display: "block",
+      display: "none",
     },
   },
   renderMessageList: {

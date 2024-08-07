@@ -9,7 +9,7 @@ import ExploreServers from "../components/main/ExploreServers";
 
 const Homepage = () => {
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", width: "100%" }}>
       <CssBaseline />
       <PrimaryAppBar />
       <PrimaryDraw>

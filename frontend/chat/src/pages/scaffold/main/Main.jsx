@@ -20,6 +20,7 @@ const Main = function ({ children }) {
         mt: `${theme.primaryAppBar.height}px`,
         height: `calc(100vh - ${theme.primaryAppBar.height}px)`,
         overflow: "hidden",
+
       }}
     >
       {/* {[...Array(40)].map((_, i) => (

@@ -10,7 +10,7 @@ import ExploreCategories from "../components/secondaryDraw/ExploreCategories";
 
 function ExplorePage() {
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", width: "100%" }}>
       <CssBaseline />
       <PrimaryAppBar />
       <PrimaryDraw>

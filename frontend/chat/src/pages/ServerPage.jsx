@@ -2,7 +2,7 @@
 import { Box, CssBaseline } from "@mui/material";
 
 // Structural imports
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 
 // Component imports
@@ -44,21 +44,35 @@ const ServerPage = () => {
   // Fetch data once the ServerPage component loads
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  },[fetchData]);
 
+  // Get the server name.
+  const serverName = useMemo(() => serverData?.[0]?.name ?? "Server", [serverData]);
+  const serverDescription = useMemo(() => serverData?.[0]?.description ?? "This is our home", [serverData])
+
+
+  // ** see noteson useMemo hook below
   // Validate the channelID
   useValidateChannel(serverData, serverId, channelId);
 
-  const providerValue = { serverData, error, isLoading, serverId, channelId}
+  const providerValue = useMemo(() => ({
+    serverData,
+    error,
+    isLoading,
+    serverId,
+    channelId,
+    serverName,
+    serverDescription
+  }), [serverData, error, isLoading, serverId, channelId, serverName, serverDescription]);
 
   
   return (
     <ServerByIdContext.Provider value={providerValue}>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", width: "100%" }}>
         <CssBaseline />
         <PrimaryAppBar/>
         <PrimaryDraw>
-          <ServerDetails/>
+          <ServerDetails open={false} />
         </PrimaryDraw>
         <SecondaryDraw>
           <ServerChannels/>
@@ -67,8 +81,17 @@ const ServerPage = () => {
           <MessageInterface />
         </Main>
     </Box>
-    </ServerByIdContext.Provider>
+  </ServerByIdContext.Provider>
   );
 };
 
 export default ServerPage;
+
+
+// Explanation:
+// useMemo: This hook is used to memoize values, ensuring they only
+// recalculate when their dependencies change. This can help optimize 
+// performance by preventing unnecessary recalculations and re-renders.
+// Provider Value Memoization: Memoizing the context provider value
+// helps prevent re-renders of all context consumers when the
+//  provider's value changes unnecessarily.

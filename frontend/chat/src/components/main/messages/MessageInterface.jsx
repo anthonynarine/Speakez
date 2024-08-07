@@ -1,28 +1,36 @@
-import { useState, useEffect } from "react";
+import { Box, Typography, TextField, Button, useTheme } from "@mui/material";
+import { useState, useEffect, useCallback } from "react";
 import useWebSocket from "react-use-websocket";
 import { useParams } from "react-router-dom";
 import useCrud from "../../../hooks/useCrud";
-
+import { MessageInterfaceStyles } from "./MessageInterfaceStyles";
+import { useServerByIdContext } from "../../../context/ServerByIdContext";
+import MessageInterfaceChannels from "./MessageInterfaceChannels";
+import MessageList from "./MessageList";
 /**
  * MessageInterface component that handles WebSocket connection and displays messages.
  */
 const MessageInterface = () => {
+  const theme = useTheme();
+  const classes = MessageInterfaceStyles(theme);
   // State for storing messages and the input message
   const [newMessages, setNewMessages] = useState([]);
   const [message, setMessage] = useState("");
 
   // Extracting serverId and channelId from URL parameters
   const { serverId, channelId } = useParams();
-
+  
   // Constructing the WebSocket URL
   const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}/` : null;
 
   // Custom hook for fetching data from the API
   const { fetchData, serverData } = useCrud([], `/messages/?channel_id=${channelId}`);
 
-  // Function to handle incoming Websocket messages
-  const handleIncomingMessage = (message) => {
-    const msgData = JSON.parse(message.msgData);
+  const { serverName, serverDescription } = useServerByIdContext();
+  
+  // Function to handle incoming WebSocket messages
+  const handleIncomingMessage = useCallback((message) => {
+    const msgData = JSON.parse(message.data); // Corrected from message.msgData
     // Create a structured object for the new message
     const newMessage = {
       id: msgData.id,
@@ -30,9 +38,9 @@ const MessageInterface = () => {
       content: msgData.new_message,
       timestamp: msgData.timestamp,
     };
-    // Updating the newMessages state wit the new message
-    setNewMessages((preMessages) => [...preMessages, newMessage]);
-  }
+    // Updating the newMessages state with the new message
+    setNewMessages((prevMessages) => [...prevMessages, newMessage]);
+  }, []);
 
   // WebSocket hook to handle connection and messages
   const { sendJsonMessage } = useWebSocket(socketURL, {
@@ -64,35 +72,79 @@ const MessageInterface = () => {
   }, [newMessages]);
 
   /**
+   * Handle key down event for the input field.
+   *
+   * @param {React.KeyboardEvent<HTMLInputElement>} e - The keyboard event.
+   */
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendJsonMessage({ type: "message", message });
+      setMessage(""); // Clear the input after sending the message
+    }
+  };
+
+  /**
+   * Handle form submission for sending a message.
+   *
+   * @param {React.FormEvent} e - The form submission event.
+   */
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (message.trim() !== "") {
+      sendJsonMessage({ type: "message", message });
+      setMessage("");
+    }
+  };
+
+  /**
    * Renders the message interface.
    */
   return (
-    <div>
-      {newMessages.map((message, index) => (
-        <div key={index}>
-          <p>{message.sender}</p>
-          <p>{message.content}</p>
-          <p>{message.timestamp}</p>
-        </div>
-      ))}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendJsonMessage({ type: "message", message }); // Send message via WebSocket
-          setMessage(""); // Clear the input field
-        }}
-      >
-        <label>
-          Enter Message:
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-        </label>
-        <button type="submit">Send Message</button>
-      </form>
-    </div>
+    <>
+      <MessageInterfaceChannels />
+      {channelId === undefined ? (
+        <Box sx={classes.messageInterfaceNoChannelSelectedBox}>
+          <Box sx={{textAlign:"center", justifyContent: "center"}}>
+          <Typography
+              variant="h4"
+              fontWeight={700}
+              letterSpacing={"-0.5px"}
+              sx={{ px: 5, maxWidth: "600px" }}
+            >
+              Welcome to {serverName} Server
+            </Typography>
+            <Typography>{serverDescription}</Typography>
+          </Box>
+        </Box>
+      ) : (
+        <>
+          <Box>
+            {newMessages.map((message, index) => (
+              <Box key={index} mb={2}>
+                <Typography variant="subtitle1">{message.sender}</Typography>
+                <Typography variant="body1">{message.content}</Typography>
+                <Typography variant="caption">{message.timestamp}</Typography>
+              </Box>
+            ))}
+          </Box>
+          <form onSubmit={handleSendMessage}>
+            <TextField
+              label="Enter Message"
+              fullWidth
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              variant="outlined"
+              margin="normal"
+            />
+            <Button type="submit" variant="contained" color="primary">
+              Send Message
+            </Button>
+          </form>
+        </>
+      )}
+    </>
   );
 };
 

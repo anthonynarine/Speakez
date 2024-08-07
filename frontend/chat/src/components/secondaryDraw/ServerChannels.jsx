@@ -32,7 +32,7 @@ function ServerChannels() {
   // Log server data for testing purposes
   useEffect(() => {
     console.log("Channel_server", serverData);
-  }, [serverData]);
+  },[serverData] );
 
   if (isLoading) {
     return <div>Loading...</div>;

@@ -24,7 +24,7 @@ const PrimaryAppBar = () => {
 
   const list = () => (
     <Box
-      sx={{ paddingTop: `${theme.primaryAppBar.height}px`, minWidth: 200 }}
+      sx={{ paddingTop: `${theme.primaryAppBar.height}px` }}
       role="presentation"
       onClick={() => toggleDrawer(false)} 
       onKeyDown={() => toggleDrawer(false)} 
