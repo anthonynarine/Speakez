@@ -121,29 +121,26 @@ const MessageInterface = () => {
         </Box>
       ) : (
         <>
-          <Box>
-            {newMessages.map((message, index) => (
-              <Box key={index} mb={2}>
-                <Typography variant="subtitle1">{message.sender}</Typography>
-                <Typography variant="body1">{message.content}</Typography>
-                <Typography variant="caption">{message.timestamp}</Typography>
-              </Box>
-            ))}
+          {/* Render each received message */}
+          <Box sx={{overflow: "hidden", p:0, height:`calc(100vh - 100px)`}}>
+            <MessageList messages={newMessages} />
           </Box>
-          <form onSubmit={handleSendMessage}>
-            <TextField
-              label="Enter Message"
-              fullWidth
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              variant="outlined"
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary">
-              Send Message
-            </Button>
-          </form>
+          <Box sx={classes.msgFormBox}>
+            <form onSubmit={handleSendMessage} style={classes.msgForm}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ paddingRight: '10px' }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  minRows={1}
+                  maxRows={4}
+                  sx={{ flexGrow: 1, pr:"10px" }}
+                  onKeyDown={handleKeyDown}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+              </Box>
+            </form>
+          </Box>
         </>
       )}
     </>
