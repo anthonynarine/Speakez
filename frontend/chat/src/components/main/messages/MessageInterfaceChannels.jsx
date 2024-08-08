@@ -11,7 +11,7 @@ import {
   } from "@mui/material";
   import { useParams } from "react-router-dom";
   import ServerChannels from "../../secondaryDraw/ServerChannels";
-  import MoreVertIccon from "@mui/icons-material/MoreVert";
+  import MoreVertIcon from "@mui/icons-material/MoreVert";
   import { MessageInterfaceStyles } from "./MessageInterfaceStyles";
   import getChannelNameFromData from "./GetChannelNameFromData";
   import { useResponsiveDrawer } from "../../../hooks/useResponsiveDrawer";
@@ -31,8 +31,8 @@ import {
         <Box
             sx={{ paddingTop: `${theme.primaryAppBar.height}px`, minWidth: 200 }}
             role="presentation"
-            onClick={toggleDrawer(false)}
-            onKeyDown={toggleDrawer(false)}
+            onClick={() => toggleDrawer(false)}
+            onKeyDown={() => toggleDrawer(false)}
         >
             <ServerChannels />
         </Box>
@@ -57,13 +57,13 @@ import {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 <Box sx={{ display: { xs: "block", sm: "none" } }}>
                 <IconButton onClick={() => toggleDrawer(true)} color="inherit" edge="end">
-                    <MoreVertIccon />
+                    <MoreVertIcon />
                 </IconButton>
                 </Box>
-                
+                <Drawer anchor="left" open={isDrawerOpen} onClose={() => toggleDrawer(false)}>
+                    {list()}
+                </Drawer>
             </Toolbar>
-
-
         </AppBar>
         </>
     )

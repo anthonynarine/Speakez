@@ -30,12 +30,12 @@ const MessageInterface = () => {
   
   // Function to handle incoming WebSocket messages
   const handleIncomingMessage = useCallback((message) => {
-    const msgData = JSON.parse(message.data); // Corrected from message.msgData
+    const msgData = JSON.parse(message.data); 
     // Create a structured object for the new message
     const newMessage = {
       id: msgData.id,
       sender: msgData.sender,
-      content: msgData.new_message,
+      content: msgData.content,
       timestamp: msgData.timestamp,
     };
     // Updating the newMessages state with the new message
@@ -49,6 +49,7 @@ const MessageInterface = () => {
       try {
         await fetchData(); // Fetch messages when WebSocket opens
         setNewMessages(Array.isArray(serverData) ? serverData : []);
+        console.log("Fetched initial messages:", serverData); // Debugging line
       } catch (error) {
         console.log(error);
       }
@@ -62,13 +63,14 @@ const MessageInterface = () => {
   useEffect(() => {
     if (Array.isArray(serverData)) {
       setNewMessages(serverData);
+      console.log("Updated messages from serverData:", serverData); // Debugging line
       console.log("Fetched data:", serverData);
     }
   }, [serverData]);
 
   // Effect to log new messages whenever they update
   useEffect(() => {
-    console.log("newMessages updated:", newMessages);
+    console.log("New messages state updated:", newMessages); // Debugging line
   }, [newMessages]);
 
   /**
