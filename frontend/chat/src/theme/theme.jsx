@@ -51,7 +51,7 @@ export const createMuiTheme = (mode) => {
                 styleOverrides: {
                     '*': {
                         scrollbarWidth: 'thin',  // For Firefox
-                        scrollbarColor: '#BFBFBF #fff',  // For Firefox
+                        scrollbarColor: mode === 'dark' ? '#090808 #121212' : '#BFBFBF #FFFFFF',  // Conditional colors for Firefox
                     },
                     'body': {
                         '&::-webkit-scrollbar': {
@@ -59,21 +59,16 @@ export const createMuiTheme = (mode) => {
                             height: '8px', // Thin scrollbar for horizontal scroll
                         },
                         '&::-webkit-scrollbar-track': {
-                            background: '#FFFFFF',  // Light background for the scrollbar track
+                            background: mode === 'dark' ? '#121212' : '#FFFFFF',  // Conditional background color
                             borderRadius: '10px',  // Rounded corners for the scrollbar track
                         },
                         '&::-webkit-scrollbar-thumb': {
-                            backgroundColor: '#FFFFFF',  // Gray color for the scrollbar thumb
+                            backgroundColor: mode === 'dark' ? '#090808' : '#BFBFBF',  // Conditional thumb color
                             borderRadius: '10px',  // Rounded corners for the scrollbar thumb
-                            border: '2px solid #FFFFFF',  // Border to add some padding
-                            opacity: 0,  // Hide the scrollbar thumb by default
-                            transition: 'opacity 0.3s',  // Smooth transition for the scrollbar thumb
+                            border: `2px solid ${mode === 'dark' ? '#121212' : '#FFFFFF'}`,  // Conditional border color
                         },
                         '&::-webkit-scrollbar-thumb:hover': {
-                            backgroundColor: '#555',  // Darker gray on hover
-                        },
-                        '&:hover::-webkit-scrollbar-thumb': {
-                            opacity: 1,  // Show the scrollbar thumb on hover
+                            backgroundColor: mode === 'dark' ? '#555' : '#888',  // Conditional hover color
                         },
                     },
                 },

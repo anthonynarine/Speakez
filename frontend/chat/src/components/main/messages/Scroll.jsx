@@ -2,7 +2,6 @@ import { Box } from "@mui/system";
 import { styled } from "@mui/material/styles";
 import { useRef, useEffect } from "react";
 
-// Style the ScrollContainer using MUI's styled API. This container has customized styles for the scrollbar.
 const ScrollContainer = styled(Box)(({ theme }) => ({
   height: `calc(100vh - 190px)`,          // Set the height minus a fixed pixel value
   overflowY: "scroll",                   // Enable vertical scrolling
@@ -13,23 +12,24 @@ const ScrollContainer = styled(Box)(({ theme }) => ({
     height: "12px",
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: theme.palette.mode === 'dark' ? "#121212" : "#121212", // Conditional color based on theme mode
+    backgroundColor: theme.palette.mode === 'dark' ? "#090808" : "#BFBFBF", // Darker thumb color in dark mode
     borderRadius: "6px",                // Rounded corners for thumb
-    border: `3px solid ${theme.palette.background.default}`, // Adds padding around the thumb
+    border: `3px solid ${theme.palette.mode === 'dark' ? "#121212" : "#FFFFFF"}`, // Conditional border color
     backgroundClip: "content-box",      // Ensure the border does not overlap the thumb
     boxShadow: "inset 0 0 4px rgba(0, 0, 0, 0.5)", // Add subtle shadow for depth
   },
   "&::-webkit-scrollbar-thumb:hover": {
-    backgroundColor: theme.palette.mode === 'dark' ? "#888" : "#555", // Conditional color based on theme mode
+    backgroundColor: theme.palette.mode === 'dark' ? "#555" : "#888", // Conditional hover color
   },
   "&::-webkit-scrollbar-track": {
-    backgroundColor: theme.palette.background.paper, // Complementary background color for track
+    backgroundColor: theme.palette.mode === 'dark' ? "#121212" : "#FFFFFF", // Conditional track color
     borderRadius: "6px",                // Rounded corners for track
   },
   "&::-webkit-scrollbar-corner": {
     backgroundColor: "transparent",      // Transparent corner
   },
 }));
+
 
 /**
  * Scroll Component.
