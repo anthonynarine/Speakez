@@ -1,4 +1,3 @@
-// Import necessary modules and hooks from libraries
 import { Box } from "@mui/system";
 import { styled } from "@mui/material/styles";
 import { useRef, useEffect } from "react";
@@ -10,18 +9,22 @@ const ScrollContainer = styled(Box)(({ theme }) => ({
   
   // Styling for the scrollbar
   "&::-webkit-scrollbar": {
-    width: "8px",
-    height: "8px",
+    width: "12px",                      // Increase the width for better visual balance
+    height: "12px",
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#888",             // Dark gray scrollbar thumb
-    borderRadius: "4px",                 // Rounded corners for thumb
+    backgroundColor: theme.palette.mode === 'dark' ? "#121212" : "#121212", // Conditional color based on theme mode
+    borderRadius: "6px",                // Rounded corners for thumb
+    border: `3px solid ${theme.palette.background.default}`, // Adds padding around the thumb
+    backgroundClip: "content-box",      // Ensure the border does not overlap the thumb
+    boxShadow: "inset 0 0 4px rgba(0, 0, 0, 0.5)", // Add subtle shadow for depth
   },
   "&::-webkit-scrollbar-thumb:hover": {
-    backgroundColor: "#555",             // Slightly darker gray when hovered
+    backgroundColor: theme.palette.mode === 'dark' ? "#888" : "#555", // Conditional color based on theme mode
   },
   "&::-webkit-scrollbar-track": {
-    // backgroundColor: "f0f0f0",       // Intentionally commented out (assuming it's kept for potential future use)
+    backgroundColor: theme.palette.background.paper, // Complementary background color for track
+    borderRadius: "6px",                // Rounded corners for track
   },
   "&::-webkit-scrollbar-corner": {
     backgroundColor: "transparent",      // Transparent corner
