@@ -5,6 +5,7 @@ import ServerPage from "./pages/ServerPage";
 import "./theme/main.css";
 import { Box } from "@mui/material";
 import ToggleColorMode from "./theme/color/ToggleColorMode";
+import LoginPage from "./pages/login/loginpage";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/explore/:categoryName" element={<ExplorePage />} />
           <Route path="/server/:serverId/:channelId?" element={<ServerPage />} />
            {/* the ? makes it optional without it will expect a property */}
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Box>
     </ToggleColorMode>

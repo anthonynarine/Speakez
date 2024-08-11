@@ -51,7 +51,7 @@ export const createMuiTheme = (mode) => {
                 styleOverrides: {
                     '*': {
                         scrollbarWidth: 'thin',  // For Firefox
-                        scrollbarColor: mode === 'dark' ? '#090808 #121212' : '#BFBFBF #FFFFFF',  // Conditional colors for Firefox
+                        scrollbarColor: mode === 'dark' ? '#757575 #121212' : '#BFBFBF #FFFFFF',  // Conditional colors for Firefox
                     },
                     'body': {
                         '&::-webkit-scrollbar': {
