@@ -39,12 +39,86 @@ authAxios.interceptors.response.use((response) => {
         });
     }
 
+    if (response.config.url.includes("/logout/")) {
+        Cookies.remove("access_token");
+        Cookies.remove("refresh_token");
+        Cookies.remove("csrftoken");
+        Cookies.remove("sessionid");
+    }
+
     return response; // Return the response for further handling
 }, (error) => {
     // Handle errors if needed
     console.error("Error in response:", error); // Log the error for debugging
     return Promise.reject(error); // Reject the promise to pass the error down the chain
 });
+
+
+////// Error handling block for handling automatic token refresh on authentication failures /////
+authAxios.interceptors.response.use(null, async (error) => {
+    const originalRequest = error.config;
+
+    // Handle expired access tokens and attempt to refresh them once
+    if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        try {
+            const response = await authAxios.post("/token-refresh/", {}, { withCredentials: true });
+
+            if (response.status === 200) {
+                const newAccessToken = response.data.access_token; // Ensure consistent variable naming
+
+                // Store the new access token in a cookie
+                Cookies.set("access_token", newAccessToken, {
+                    expires: 1 / 96, // 15 min expiry
+                    secure: isProduction, 
+                    sameSite: isProduction ? "None" : "Lax"
+                });
+                
+                // Update the authorization header for the original request
+                originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`; // Corrected typo
+
+                // Update Axios default header for subsequent requests
+                authAxios.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+
+                // Retry the original request with the new token
+                return authAxios(originalRequest);
+            }
+        } catch (refreshError) {
+            console.error("Failed to refresh access token", refreshError);
+            // Optionally, handle logout or redirection to the login page
+            Cookies.remove("access_token");
+            Cookies.remove("refresh_token");
+            Cookies.remove("csrftoken");
+            Cookies.remove("sessionid");
+        }
+    }
+
+    // If the error isn't a 401 or the token refresh fails, reject the promise
+    return Promise.reject(error);
+});
+
+
+/////////////   Requst configurations ///////////////////
+// Request interceptor for attatching access token and CSRF token
+authAxios.interceptors.request.use((config) => {
+    // Get the access token from cookies
+    const accessToken = Cookies.get("access_token");
+    if (accessToken) {
+        config.headers["Authorization"] = `Bearer ${accessToken}`; 
+    }
+
+    // Get the CSRF token from cookies
+    const csrfToken = Cookies.get("csrftoken"); 
+    if (csrfToken) {
+        config.headers["X-CSRFToken"] = csrfToken;
+    }
+
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+
 
 export default authAxios;
 
