@@ -1,5 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom"
+import { useEffect } from "react";
 
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -53,6 +55,16 @@ authAxios.interceptors.response.use((response) => {
     return Promise.reject(error); // Reject the promise to pass the error down the chain
 });
 
+function handleAuthError (error) {
+
+    console.error("Authentication error", error);
+    Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
+    Cookies.remove("csrftoken");
+    Cookies.remove("sessionid");
+}
+
+
 
 ////// Error handling block for handling automatic token refresh on authentication failures /////
 authAxios.interceptors.response.use(null, async (error) => {
@@ -84,12 +96,7 @@ authAxios.interceptors.response.use(null, async (error) => {
                 return authAxios(originalRequest);
             }
         } catch (refreshError) {
-            console.error("Failed to refresh access token", refreshError);
-            // Optionally, handle logout or redirection to the login page
-            Cookies.remove("access_token");
-            Cookies.remove("refresh_token");
-            Cookies.remove("csrftoken");
-            Cookies.remove("sessionid");
+
         }
     }
 

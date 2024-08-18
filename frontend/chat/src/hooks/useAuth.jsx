@@ -1,5 +1,6 @@
 import { useReducer, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthAxios from "./useAuthAxios";
 
 // Define the initial state 
 const initialState = {
@@ -29,15 +30,16 @@ export const useAuth = () => {
 
     const [state, dispatch] = useReducer(reducer, initialState);
     const navigate = useNavigate();
+    const authAxios = useAuthAxios()
 
     const login = useCallback(async ({email, password}) => {
         dispatch({ type: "SET_LODING", payload: true});
         try{
-            /// Step 1: Log in and obtain tokens using publicAxios
-            const loginResponse = await publicAxios.post("/login/", { email, password });
+            /// Step 1: Log in and obtain tokens using authAxios
+            const loginResponse = await authAxios.post("/login/", { email, password });
 
             // Step 2: Validate the session and fetch user information
-            const userInfoResponse = await publicAxios.get("/validate-session/")
+            const userInfoResponse = await authAxios.get("/validate-session/")
 
             // Update the state with the user information
             dispatch({ type: "SET_USER", payload: userInfoResponse.data });

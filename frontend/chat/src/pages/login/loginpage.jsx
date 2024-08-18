@@ -11,6 +11,7 @@ import {
   Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useAuth } from "../../hooks/useAuth";
 // import useAuth from '../hooks/useAuth'; 
 
 const LoginPage = () => {
