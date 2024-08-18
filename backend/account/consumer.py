@@ -5,7 +5,7 @@ from decouple import config
 import time
 from .models import UserProfile
 
-# Initialize the logger
+# Initialize the logger for your consumer
 logger = logging.getLogger(__name__)
 
 # Reduce Pika's log level to WARNING to avoid overwhelming logs
@@ -19,11 +19,14 @@ def create_chat_profile(user_data):
 
     Args:
         user_data (dict): A dictionary containing user information 
-                        with keys 'email', 'first_name', and 'last_name'.
+                          with keys 'email', 'first_name', and 'last_name'.
 
     Logs:
-        Information when a user profile is successfully created.
-        Errors if the profile creation fails.
+        - Logs a success message when a user profile is successfully created.
+        - Logs an error message if profile creation fails due to any exception.
+
+    Raises:
+        Exception: Propagates the exception to be handled by the caller.
     """
     try:
         # Attempt to create a new user profile using the provided data
@@ -37,6 +40,7 @@ def create_chat_profile(user_data):
     except Exception as e:
         # Log error message if profile creation fails, capturing the exception
         logger.error(f"Failed to create user profile: {e}")
+        raise  # Re-raise the exception for further handling
 
 
 def callback(channel, method, properties, body):
@@ -46,17 +50,19 @@ def callback(channel, method, properties, body):
     Args:
         channel: The channel object from RabbitMQ for message communication.
         method: Delivery method containing metadata such as exchange and routing key.
-        properties: Message properties (e.g., headers, content type).
-        body (bytes): The message body containing user data as JSON.
+        properties: Message properties, including headers and content type.
+        body (bytes): The message body containing user data in JSON format.
 
     Process:
-        - Deserialize the message body from JSON to a Python dictionary.
-        - Call `create_chat_profile` to store the user data in the database.
-        - Acknowledge the message if processing is successful.
-        - Reject and requeue the message if processing fails.
-        - Retry limit of 5 attempts with exponential backoff to prevent infinite retries. 
+        - Deserializes the message body from JSON to a Python dictionary.
+        - Calls `create_chat_profile` to store the user data in the database.
+        - Acknowledges the message if processing is successful.
+        - Implements retry logic with exponential backoff if processing fails.
+        - Moves the message to a dead-letter queue (DLQ) after exceeding the retry limit.
+
     Logs:
-        Errors if the message processing or user profile creation fails.
+        - Logs errors during message processing or user profile creation.
+        - Logs retry attempts and delays between retries.
     """
     max_retries = 5  # Maximum number of retries allowed
     base_backoff = 2  # Base backoff time in seconds
@@ -65,7 +71,7 @@ def callback(channel, method, properties, body):
         # Deserialize the message body from JSON to a dictionary
         user_data = json.loads(body)
         
-        # Check the retry count in the message properties (default to 0 if not present)
+        # Initialize retry_count safely, defaulting to 0 if not present
         retry_count = int(properties.headers.get("retry_count", 0)) if properties.headers else 0
         
         # Create the chat profile using the deserialized user data
@@ -78,13 +84,15 @@ def callback(channel, method, properties, body):
         if retry_count >= max_retries:
             # Log and move the message to the dead-letter queue (DLQ)
             logger.error(f"Message failed after {retry_count} retries. Moving to DLQ: {e}")
+            # Reject the message and do not requeue it, sending it to the DLQ
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         else:
             # Increment the retry count and apply exponential backoff
             headers = properties.headers or {}
             headers["retry_count"] = retry_count + 1
             
-            backoff_time = base_backoff ** retry_count  # Exponential backoff
+            # Calculate backoff time based on retry count (exponential backoff)
+            backoff_time = base_backoff ** retry_count
             logger.error(f"Retrying message in {backoff_time} seconds, attempt {retry_count + 1}: {e}")
             
             # Delay the retry by the calculated backoff time
@@ -108,28 +116,28 @@ def start_consumer():
     
     Process:
         - Establish a connection to RabbitMQ using credentials from environment variables.
-        - Declare the dead-letter exchange for handling failed messages.
-        - Declare a retry queue with TTL for automatic message reprocessing.
-        - Bind the retry queue to the dead-letter exchange.
-        - Declare the main queue ('user_registration_queue') with dead-letter settings.
-        - Begin consuming messages from the main queue using the `callback` function.
+        - Declare a fanout exchange to receive user events.
+        - Declare the main queue ('user_registration_queue') to store incoming user registration messages.
+        - Bind the main queue to the fanout exchange to receive broadcasted messages.
+        - Set up retry and dead-letter queues (DLQ) for handling failed message processing.
+        - Start consuming messages from the main queue using the `callback` function.
 
     Logs:
-        Information when the consumer starts successfully.
-        Errors if the connection or channel setup fails.
+        - Logs when the consumer starts successfully.
+        - Logs errors if the connection or channel setup fails.
     """
     try:
         # Establish a connection to RabbitMQ using the CloudAMQP URL from environment variables
         connection = pika.BlockingConnection(pika.URLParameters(config("CLOUDAMQP_URL")))
         channel = connection.channel()
         
-        # Declare the fanout exchange "user_events"
+        # Declare the fanout exchange "user_events" to receive user-related events
         channel.exchange_declare(exchange="user_events", exchange_type="fanout")
         
-        # Delcare the main queue ("user_registration_queue") and ensure it's durable
+        # Declare the main queue ("user_registration_queue") and ensure it's durable
         channel.queue_declare(queue="user_registration_queue", durable=True)
         
-        # Bind the main queue to the fanout exchange to receive all the boradcasted messages
+        # Bind the main queue to the fanout exchange to receive all broadcasted messages
         channel.queue_bind(exchange="user_events", queue="user_registration_queue")
         
         # Declare the dead-letter exchange to handle messages that fail to process
@@ -152,6 +160,7 @@ def start_consumer():
         # Start consuming messages from the main queue using the `callback` function
         channel.basic_consume(queue="user_registration_queue", on_message_callback=callback)
         
+        # Log that the consumer has started and is waiting for messages
         logger.info("Consumer started, waiting for messages.")
         
         # Start the blocking loop to continuously consume and process messages
