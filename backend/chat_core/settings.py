@@ -9,7 +9,6 @@ julia_fiesta_logs()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = [
@@ -47,6 +46,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Custom middleware for decoding jwt tokens
+    "account.auth_middleware.TokenAuthenticationMiddleware", 
     
 ]
 
@@ -138,21 +139,6 @@ REST_FRAMEWORK = {
         # "account.authenticate.JWTCookieAuthentication",
     ],
 }
-
-
-# ...ADDED...
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  #TESTING TIMER
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "ALGORITHM": "HS384",
-    #JWTcookie
-    "ACCESS_TOKEN_NAME": "access_token",
-    "REFRESH_TOKEN_NAME": "refresh_token",
-    "JWT_COOKIE_SAMESITE": "LAX"
-}
-
 
 # CORS Headers Configuration
 CORS_ALLOWED_ORIGINS = [

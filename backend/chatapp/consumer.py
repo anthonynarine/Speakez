@@ -2,6 +2,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from .models import Conversation, Message
+from account.models import UserProfile
 
 User = get_user_model()
 
@@ -9,7 +10,7 @@ class ChatAppConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.channel_id = None
-        self.user = None
+        self.upser_profile = None
         self.room_name = None
 
     def connect(self):
