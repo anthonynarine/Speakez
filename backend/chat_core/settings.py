@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "server",
     "account", 
     "chatapp", 
+    "auth_backend"
 ]
 
 MIDDLEWARE = [
@@ -47,7 +48,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Custom middleware for decoding jwt tokens
-    "account.auth_middleware.TokenAuthenticationMiddleware", 
+    # "account.auth_middleware.TokenAuthenticationMiddleware", 
     
 ]
 
@@ -139,6 +140,12 @@ REST_FRAMEWORK = {
         # "account.authenticate.JWTCookieAuthentication",
     ],
 }
+
+# Update AUTHENTICATION_BACKENDS
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'auth_backend.backends.JWTAuthenticationBackend',
+]
 
 # CORS Headers Configuration
 CORS_ALLOWED_ORIGINS = [

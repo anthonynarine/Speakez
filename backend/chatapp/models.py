@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from account.models import UserProfile
 
 class Conversation(models.Model):
     """
@@ -46,7 +44,7 @@ class Message(models.Model):
         help_text="The chat channel this message belongs to."
     )
     sender = models.ForeignKey(
-        User,
+        UserProfile,
         null=True,
         on_delete=models.SET_NULL,
         verbose_name="Sender",

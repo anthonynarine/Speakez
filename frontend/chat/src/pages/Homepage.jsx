@@ -7,7 +7,16 @@ import PopularChannels from "../components/primaryDraw/PopularChannels";
 import ExploreCategories from "../components/secondaryDraw/ExploreCategories";
 import ExploreServers from "../components/main/ExploreServers";
 
+import { useAuthServices } from "../context/AuthContext";
+import { useEffect } from "react";
+
 const Homepage = () => {
+  const { user, isLoggedIn } = useAuthServices()
+  useEffect(()=> {
+    console.log("User state after login", user)
+    console.log("User status", isLoggedIn)
+  },[user])
+
   return (
     <Box sx={{ display: "flex", width: "100%" }}>
       <CssBaseline />

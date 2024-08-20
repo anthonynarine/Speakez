@@ -1,76 +1,63 @@
-import { useReducer, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthAxios from "./useAuthAxios";
 
-// Define the initial state 
-const initialState = {
-    isLoading: false,
-    user: null,
-    isLoggedIn: null, 
-    error: "",
-};
-
-// Define the reducer function withinthe the hook
-function reducer(state, action) {
-    switch (action.type) {
-        case "SET_LOADING":
-            return {...state, isLoading: action.payload };
-        case "SET_USER":
-            return {...state, user: action.payload, isLoggedIn: true, error: ""};
-        case "SET_ERROR":
-            return {...state, error: action.payload };
-        case "LOGOUT":
-            return {...state, user: null, isLoggedIn: false, isLoading: false, error: "" };
-        default:
-            return state;
-    }
-};
-
 export const useAuth = () => {
-
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const authAxios = useAuthAxios();
     const navigate = useNavigate();
-    const authAxios = useAuthAxios()
 
-    const login = useCallback(async ({email, password}) => {
-        dispatch({ type: "SET_LODING", payload: true});
-        try{
-            /// Step 1: Log in and obtain tokens using authAxios
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState("");
+
+    const login = useCallback(async ({ email, password }) => {
+        setIsLoading(true);
+        try {
+            console.log("Logging in with:", { email, password });
+
             const loginResponse = await authAxios.post("/login/", { email, password });
+            console.log(loginResponse);
 
-            // Step 2: Validate the session and fetch user information
-            const userInfoResponse = await authAxios.get("/validate-session/")
+            const userInfoResponse = await authAxios.get("/validate-session/");
+            console.log("User Info Response:", userInfoResponse.data)
 
-            // Update the state with the user information
-            dispatch({ type: "SET_USER", payload: userInfoResponse.data });
-            navigate("/")            
+            // Update the user state
+            setUser(userInfoResponse.data);
+            setIsLoggedIn(true)
+
+            // Navigate if needed
+            setTimeout(()=> {
+                navigate("/");
+            }, 100)
         } catch (error) {
             const errorMessage = error.response?.data?.error || "An error occurred during login.";
-            dispatch({ type: "SET_ERROR", payload: errorMessage});
-            console.error("Login error:", error)
+            setError(errorMessage);
+            console.error("Login error:", error);
         } finally {
-            dispatch({ type: "SET_LOADING", payload: false });
+            setIsLoading(false);
         }
     }, [navigate]);
 
-
     const logout = useCallback(async () => {
-        dispatch({ type: "SET_LOADING", payload: true });
+        setIsLoading(true);
         try {
             await authAxios.post("/logout/");
-            // authAxios interceptor will remove tokens
-            dispatch({ type: "LOGOUT"});
+            setUser(null);
             navigate("/login");
         } catch (error) {
             console.error("Logout error", error);
         } finally {
-            dispatch({ type: "SET_LOADING", payload: false });
+            setIsLoading(false);
         }
-    }, [navigate])
+    }, [navigate]);
 
     return {
-        ...state,
+        isLoading,
+        user,
+        error,
         login,
         logout,
+        isLoggedIn
     };
 };

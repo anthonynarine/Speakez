@@ -5,24 +5,29 @@ import ServerPage from "./pages/ServerPage";
 import "./theme/main.css";
 import { Box } from "@mui/material";
 import ToggleColorMode from "./theme/color/ToggleColorMode";
-import LoginPage from "./pages/login/loginpage";
+import LoginPage from "./pages/loginpage/LoginPage";
+import RegisterPage from "./pages/registerpage/RegisterPage";
+import AuthProvider from "./context/AuthContext";
 
 
 function App() {
 
 
   return (
-    <ToggleColorMode>
-      <Box sx={{ display: "flex" }}>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/explore/:categoryName" element={<ExplorePage />} />
-          <Route path="/server/:serverId/:channelId?" element={<ServerPage />} />
-           {/* the ? makes it optional without it will expect a property */}
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </Box>
-    </ToggleColorMode>
+    <AuthProvider> 
+      <ToggleColorMode>
+        <Box sx={{ display: "flex" }}>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/explore/:categoryName" element={<ExplorePage />} />
+            <Route path="/server/:serverId/:channelId?" element={<ServerPage />} />
+            {/* the ? makes it optional without it will expect a property */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Routes>
+        </Box>
+      </ToggleColorMode>
+    </AuthProvider>
   );
 }
 

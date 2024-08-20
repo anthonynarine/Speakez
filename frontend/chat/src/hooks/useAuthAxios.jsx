@@ -15,7 +15,7 @@ const useAuthAxios = () => {
 
     // Create an Axios instance configured to interact with the authentication API
     const authAxios = axios.create({
-        baseURL: process.env.REACT_APP_AUTH_URL,
+        baseURL: process.env.REACT_APP_AUTH_API_URL,
         withCredentials: true // Ensure cookies are sent with the request
     });
 
