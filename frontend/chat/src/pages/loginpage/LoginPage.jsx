@@ -104,20 +104,45 @@ const LoginPage = () => {
                   error={Boolean(error?.email)}
                   helperText={error?.email}
                   InputLabelProps={{
-                    shrink: email.length > 0,
-                    style: { color: email.length > 0 ? "#e0e0e0" : "#b0b0b0" },
+                    shrink: email.length > 0 || Boolean(email), // Ensure label shrinks if there's content
+                    style: { color: "#e0e0e0" }, // Keep label color consistent
                   }}
                   InputProps={{
-                    style: { color: "#e0e0e0" },
+                    style: { color: "#e0e0e0" }, // Ensure text color is consistent
+                    sx: {
+                      "&:-webkit-autofill": {
+                        WebkitBoxShadow: "0 0 0 1000px rgba(34, 34, 34, 0.9) inset", // Match the background to your desired style
+                        WebkitTextFillColor: "#e0e0e0", // Force the text color to be consistent with your theme
+                        transition: "background-color 5000s ease-in-out 0s", // Prevent autofill background color from being applied
+                      },
+                      "&.MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#e0e0e0", // Default border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#e0e0e0", // Border color on hover
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#e0e0e0", // Border color when focused
+                        },
+                      },
+                    },
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#e0e0e0", // Default border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#e0e0e0", // Border color on hover
+                      },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#e0e0e0",
+                        borderColor: "#e0e0e0", // Border color when focused
                       },
                     },
                   }}
                 />
+
                 <TextField
                   variant="outlined"
                   margin="normal"
@@ -133,11 +158,11 @@ const LoginPage = () => {
                   error={Boolean(error?.password)}
                   helperText={error?.password}
                   InputLabelProps={{
-                    shrink: password.length > 0,
-                    style: { color: password.length > 0 ? "#e0e0e0" : "#b0b0b0" },
+                    shrink: password.length > 0 || Boolean(password), // Ensure label shrinks if there's content
+                    style: { color: "#e0e0e0" }, // Keep label color consistent
                   }}
                   InputProps={{
-                    style: { color: "#e0e0e0" },
+                    style: { color: "#e0e0e0" }, // Ensure text color is consistent
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
@@ -150,11 +175,24 @@ const LoginPage = () => {
                         </IconButton>
                       </InputAdornment>
                     ),
+                    sx: {
+                      "&:-webkit-autofill": {
+                        WebkitBoxShadow: "0 0 0 1000px rgba(34, 34, 34, 0.9) inset", // Match the background to your desired style
+                        WebkitTextFillColor: "#e0e0e0", // Force the text color to be consistent with your theme
+                        transition: "background-color 5000s ease-in-out 0s", // Prevent autofill background color from being applied
+                      },
+                    },
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#e0e0e0", // Default border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#e0e0e0", // Border color on hover
+                      },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#e0e0e0",
+                        borderColor: "#e0e0e0", // Border color when focused
                       },
                     },
                   }}

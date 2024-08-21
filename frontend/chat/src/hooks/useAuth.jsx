@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthAxios from "./useAuthAxios";
 
@@ -51,6 +51,26 @@ export const useAuth = () => {
             setIsLoading(false);
         }
     }, [navigate]);
+
+    // Validate the session when app loads (persist user session)
+    useEffect(() => {
+        const validateSession = async () => {
+          setIsLoading(true);
+          try {
+            const userInfoResponse = await authAxios.get("/validate-session/");
+            setUser(userInfoResponse.data);
+            setIsLoggedIn(true);
+          } catch (error) {
+            console.error("Session validation failed:", error);
+            setIsLoggedIn(false);
+            setUser(null); // Clear user state if session validation fails
+          } finally {
+            setIsLoading(false);
+          }
+        };
+    
+        validateSession();
+      }, []);
 
     return {
         isLoading,
