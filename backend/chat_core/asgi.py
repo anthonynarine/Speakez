@@ -9,6 +9,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "chat_core.settings")
 # Initialize the Django application before importing URLs
 django_application = get_asgi_application()
 
+from chatapp.middleware import JWTAuthMiddleware
 import chat_core.urls as urls
 
 # Define the ASGI application
@@ -19,7 +20,9 @@ application = ProtocolTypeRouter(
 
         # Route WebSocket connections using AllowedHostsOriginValidator for security
         "websocket": AllowedHostsOriginValidator(
-            URLRouter(urls.websocket_urlpatterns)
+            JWTAuthMiddleware( # Wrap URLRouter with your JWTAuthMiddleware
+            URLRouter(urls.websocket_urlpatterns)   
+            )
         ),
     }
 )

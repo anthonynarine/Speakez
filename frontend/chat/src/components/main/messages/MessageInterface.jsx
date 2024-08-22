@@ -7,6 +7,7 @@ import { MessageInterfaceStyles } from "./MessageInterfaceStyles";
 import { useServerByIdContext } from "../../../context/ServerByIdContext";
 import MessageInterfaceChannels from "./MessageInterfaceChannels";
 import MessageList from "./MessageList";
+import Cookies from "js-cookie"
 /**
  * MessageInterface component that handles WebSocket connection and displays messages.
  */
@@ -19,9 +20,11 @@ const MessageInterface = () => {
 
   // Extracting serverId and channelId from URL parameters
   const { serverId, channelId } = useParams();
+
+  const token = Cookies.get("access_token");
   
   // Constructing the WebSocket URL
-  const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}/` : null;
+  const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}/?token={token}` : null;
 
   // Custom hook for fetching data from the API
   const { fetchData, serverData } = useCrud([], `/messages/?channel_id=${channelId}`);
