@@ -24,7 +24,7 @@ const MessageInterface = () => {
   const token = Cookies.get("access_token");
   
   // Constructing the WebSocket URL
-  const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}/?token={token}` : null;
+  const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}/?token=${token}` : null;
 
   // Custom hook for fetching data from the API
   const { fetchData, serverData } = useCrud([], `/messages/?channel_id=${channelId}`);

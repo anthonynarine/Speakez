@@ -55,7 +55,7 @@ def get_user_from_token(token):
         logger.exception(f"An unexpected error occurred while processing the token: {str(e)}")
         return None
     
-class JWTAuthMiddleware(BaseMiddleware):
+class JWTWebsocketAuthMiddleware(BaseMiddleware):
     """
     Custom middleware for WebSocket connections that handles JWT authentication.
 
@@ -112,7 +112,7 @@ class JWTAuthMiddleware(BaseMiddleware):
     ```
     """
 
-async def authenticate_websocket_connection(self, scope, receive, send):
+async def __call__(self, scope, receive, send):
     """
     Intercepts WebSocket connection requests and handles JWT authentication.
 
@@ -131,7 +131,7 @@ async def authenticate_websocket_connection(self, scope, receive, send):
         awaitable: Proceeds with the connection flow by calling the next middleware in the stack or
         the main WebSocket handler.
     """
-    # Extract the query string from the connection's scope, which may contain the JWT
+   # Extract the query string from the connection's scope, which may contain the JWT
     query_string = scope.get("query_string", b"").decode("utf-8")
     
     # Log the query string for debugging
@@ -149,10 +149,17 @@ async def authenticate_websocket_connection(self, scope, receive, send):
             logger.debug("Token found, attempting to authenticate.")
             
             # If a token is found, attempt to retrieve the corresponding user
-            scope["user"] = await get_user_from_token(token)
+            user = await get_user_from_token(token)
             
-            # Log successful authentication
-            logger.info(f"User {scope['user']} authenticated successfully.")
+            if user:
+                # If user is authenticated, attach the user to the scope
+                scope["user"] = user
+                logger.info(f"User {user.email} authenticated successfully.")
+            else:
+                # If user is not found or token is invalid, treat as anonymous
+                logger.warning("User authentication failed, treating as AnonymousUser.")
+                scope["user"] = AnonymousUser()
+                
         except Exception as e:
             # Log any exception that occurs during token validation
             logger.error(f"Error during token authentication: {e}")

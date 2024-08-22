@@ -87,8 +87,11 @@ class ChatAppConsumer(JsonWebsocketConsumer):
             self.send_json(message)
 
     def disconnect(self, code):
-        # Log the disconnection event
-        logger.info(f"User {self.user_profile.email} disconnected from conversation {self.room_name} with code {code}")
+        if self.user_profile:
+            logger.info(f"User {self.user_profile.email} disconnected from conversation {self.room_name} with code {code}")
+        else:
+            logger.info(f"Anonymous user disconnected from conversation {self.room_name} with code {code}")
+        
         
         # Leave the conversation group
         async_to_sync(self.channel_layer.group_discard)(
