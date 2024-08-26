@@ -113,6 +113,7 @@ class JWTWebsocketAuthMiddleware(BaseMiddleware):
     """
 
 async def __call__(self, scope, receive, send):
+    logger.debug("JWTWebsocketAuthMiddleware: Middleware invoked")
     """
     Intercepts WebSocket connection requests and handles JWT authentication.
 
@@ -131,7 +132,7 @@ async def __call__(self, scope, receive, send):
         awaitable: Proceeds with the connection flow by calling the next middleware in the stack or
         the main WebSocket handler.
     """
-   # Extract the query string from the connection's scope, which may contain the JWT
+    # Extract the query string from the connection's scope, which may contain the JWT
     query_string = scope.get("query_string", b"").decode("utf-8")
     
     # Log the query string for debugging
