@@ -8,11 +8,10 @@ import ToggleColorMode from "./theme/color/ToggleColorMode";
 import LoginPage from "./pages/loginpage/LoginPage";
 import RegisterPage from "./pages/registerpage/RegisterPage";
 import AuthProvider from "./context/AuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 
 function App() {
-
-
   return (
     <AuthProvider> 
       <ToggleColorMode>
@@ -20,8 +19,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Homepage />} />
             <Route path="/explore/:categoryName" element={<ExplorePage />} />
-            <Route path="/server/:serverId/:channelId?" element={<ServerPage />} />
             {/* the ? makes it optional without it will expect a property */}
+            <Route path="/server/:serverId/:channelId?" element={
+              <ProtectedRoute>
+                <ServerPage />
+              </ProtectedRoute>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Routes>

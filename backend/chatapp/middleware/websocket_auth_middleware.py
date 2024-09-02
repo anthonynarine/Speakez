@@ -172,3 +172,9 @@ async def __call__(self, scope, receive, send):
     
     # Proceed with the connection by calling the next middleware or handler in the stack
     return await super().__call__(scope, receive, send)
+
+
+class SimpleLoggingMiddleware(BaseMiddleware):
+    async def __call__(self, scope, receive, send):
+        logger.info("SimpleLoggingMiddleware: Middleware invoked")
+        return await super().__call__(scope, receive, send)

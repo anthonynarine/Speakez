@@ -1,13 +1,15 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAuthAxios from "./useAuthAxios";
+import Cookies from 'js-cookie'; 
 
 export const useAuth = () => {
     const authAxios = useAuthAxios();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get('access_token')); // Check if token exists in cookies
     const [user, setUser] = useState(null);
     const [error, setError] = useState("");
 
@@ -52,25 +54,27 @@ export const useAuth = () => {
         }
     }, [navigate]);
 
-    // Validate the session when app loads (persist user session)
-    useEffect(() => {
-        const validateSession = async () => {
-          setIsLoading(true);
-          try {
+    
+    const validateSession = useCallback(async () => {
+        if (!isLoggedIn) return;  // Only validate session if the user is logged in
+
+        try {
             const userInfoResponse = await authAxios.get("/validate-session/");
             setUser(userInfoResponse.data);
-            setIsLoggedIn(true);
-          } catch (error) {
+        } catch (error) {
             console.error("Session validation failed:", error);
-            setIsLoggedIn(false);
-            setUser(null); // Clear user state if session validation fails
-          } finally {
-            setIsLoading(false);
-          }
-        };
-    
-        validateSession();
-      }, []);
+            // Handle error (e.g., logout user if the session is no longer valid)
+        }
+    }, [authAxios, isLoggedIn]);
+
+    // Revalidate session when the user is logged in
+    useEffect(() => {
+        if (isLoggedIn) {
+            validateSession();  
+        }
+    }, [validateSession, isLoggedIn]);
+
+
 
     return {
         isLoading,

@@ -3,7 +3,7 @@ import { Box, CssBaseline } from "@mui/material";
 
 // Structural imports
 import React, { useEffect, useMemo } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 // Component imports
 import PrimaryAppBar from "../pages/scaffold/primaryAppBar/PrimaryAppBar";
@@ -20,6 +20,7 @@ import useValidateChannel from "../hooks/useValidateChannel";
 
 // Context import 
 import ServerByIdContext from "../context/ServerByIdContext";
+import { useAuthServices } from "../context/AuthContext";
 
 /**
  * ServerPage component
@@ -34,7 +35,20 @@ import ServerByIdContext from "../context/ServerByIdContext";
 const ServerPage = () => {
   // Extract the serverId and channelId parameters from the URL 
   const { serverId, channelId } = useParams();
+  const navigate = useNavigate();
+
+  // Access authentication status from the context
+  const { isLoggedIn } = useAuthServices()
   
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    console.log("ServerPage rendered. Checking isLoggedIn:", isLoggedIn);
+    if (!isLoggedIn) {
+      console.log("Not logged in. Redirecting to login.");
+      navigate("/login/");
+    };
+  }, [isLoggedIn])
+
   // bring in state and functions form useCrud hook
   const { serverData, error, isLoading, fetchData } = useCrud(
     [],

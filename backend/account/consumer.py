@@ -19,7 +19,7 @@ def create_chat_profile(user_data):
 
     Args:
         user_data (dict): A dictionary containing user information 
-                          with keys 'email', 'first_name', and 'last_name'.
+                        with keys 'email', 'first_name', and 'last_name'.
 
     Logs:
         - Logs a success message when a user profile is successfully created.
