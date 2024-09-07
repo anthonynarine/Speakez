@@ -5,6 +5,8 @@ import jwt
 from django.contrib.auth.models import AnonymousUser
 from .models import UserProfile
 
+JWT_ACCESS_SECRET = config("JWT_ACCESS_SECRET")
+
 # Set up the logger
 logger = logging.getLogger(__name__)
 
@@ -24,10 +26,12 @@ def get_user_from_token(token):
                             None if the token is expired, invalid, or the user does not exist.
     """
     try:
+
         logger.debug(f"Decoding token: {token}")
+        
 
         # Decode the JWT using the access secret key
-        payload = jwt.decode(token, config("JWT_ACCESS_SECRET"), algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_ACCESS_SECRET, algorithms=["HS256"])
         logger.info(f"Token decoded successfully: {payload}")
 
         # Extract the user ID from the token payload
@@ -43,8 +47,8 @@ def get_user_from_token(token):
     except jwt.ExpiredSignatureError:
         logger.warning("Token has expired")
         return None
-    except jwt.InvalidTokenError:
-        logger.error("Invalid token")
+    except jwt.InvalidTokenError as e:
+        logger.error(f"Invalid token: {e}")
         return None
     except UserProfile.DoesNotExist:
         logger.error(f"UserProfile does not exist for user ID {user_id}")

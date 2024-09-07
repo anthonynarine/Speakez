@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from account.consumer import start_consumer
+from backend.account.rabbitmq_consumer import start_consumer
 
 # TODO lEARN HOW TO RECONFIGURE IN PRODUCTION TO AN INDEPENDENT DYNO ON HEROKU
 

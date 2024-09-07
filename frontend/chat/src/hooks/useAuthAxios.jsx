@@ -90,7 +90,7 @@ const useAuthAxios = () => {
         // Set access token if present in the response
         const accessToken = response.data.access_token;
         if (accessToken) {
-            setCookie("access_token", accessToken, { expires: 1 / 96 }); // 15 minutes expiry
+            setCookie("access_token", accessToken, { expires: 1 / 1440 }); // 15 minutes expiry
         }
 
         // Set refresh token if present in the response

@@ -1,4 +1,8 @@
 from django.contrib import admin
-from .models import Account
+from .models import UserProfile
 
-admin.site.register(Account)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email', 'first_name', 'last_name')
+
+# Register the UserProfile model with the custom admin class
+admin.site.register(UserProfile, UserProfileAdmin)

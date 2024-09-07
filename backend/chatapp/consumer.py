@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 from .models import Conversation, Message
 from account.models import UserProfile
 
+
 # Create a logger instance
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,7 @@ class ChatAppConsumer(JsonWebsocketConsumer):
                 sender=sender,
                 content=message
             )
+            
             
             # Log the received message
             logger.info(f"Message received from {sender.email} in conversation {self.room_name}: {message}")

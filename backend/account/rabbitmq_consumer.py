@@ -19,28 +19,46 @@ def create_chat_profile(user_data):
 
     Args:
         user_data (dict): A dictionary containing user information 
-                        with keys 'email', 'first_name', and 'last_name'.
+                        with keys 'id', 'email', 'first_name', and 'last_name'.
 
     Logs:
         - Logs a success message when a user profile is successfully created.
-        - Logs an error message if profile creation fails due to any exception.
+        - Logs an error message if profile creation or update fails due to any exception.
 
     Raises:
         Exception: Propagates the exception to be handled by the caller.
+        
+    Note:
+        This function uses `update_or_create()` instead of `create()` to ensure idempotency.
+        - If a profile with the same `id` exists, it will be updated with the provided data.
+        - If no such profile exists, a new one will be created.
+        This prevents the creation of duplicate profiles and ensures consistent user data
+        across systems when events may be processed multiple times or user data needs to 
+        be updated.
     """
     try:
         # Attempt to create a new user profile using the provided data
-        UserProfile.objects.create(
-            email=user_data["email"], 
-            first_name=user_data["first_name"],
-            last_name=user_data["last_name"]
+        profile, created = UserProfile.objects.update_or_create(
+            id=user_data["id"],  # Use the ID from the auth system
+            defaults={
+                "email": user_data["email"],
+                "first_name": user_data["first_name"],
+                "last_name": user_data["last_name"],
+            }
         )
-        # Log success message indicating the user profile was created
-        logger.info(f"User profile created for {user_data['email']}")
+        
+        if created:
+            # Log success message indicating the user profile was created
+            logger.info(f"User profile created for {user_data['email']}")
+        else:
+            # Log a message if an existing profile was updated
+            logger.info(f"User profile updated for {user_data['email']}")
+            
     except Exception as e:
-        # Log error message if profile creation fails, capturing the exception
-        logger.error(f"Failed to create user profile: {e}")
+        # Log error message if profile creation or update fails, capturing the exception
+        logger.error(f"Failed to create or update user profile: {e}")
         raise  # Re-raise the exception for further handling
+
 
 
 def callback(channel, method, properties, body):

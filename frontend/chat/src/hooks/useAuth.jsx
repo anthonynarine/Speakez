@@ -1,12 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAuthAxios from "./useAuthAxios";
 import Cookies from 'js-cookie'; 
 
 export const useAuth = () => {
     const authAxios = useAuthAxios();
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get('access_token')); // Check if token exists in cookies
@@ -54,7 +53,7 @@ export const useAuth = () => {
         }
     }, [navigate]);
 
-    
+
     const validateSession = useCallback(async () => {
         if (!isLoggedIn) return;  // Only validate session if the user is logged in
 
