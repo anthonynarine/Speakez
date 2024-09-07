@@ -18,6 +18,12 @@ def get_user_from_token(token):
     This function decodes the JWT token using the secret key, extracts the user ID from the token payload,
     and fetches the corresponding UserProfile object from the database.
     
+    The @database_sync_to_async decorator is required because this function interacts with the database,
+    which is normally a blocking operation. In asynchronous Django applications (such as those using 
+    Django Channels for WebSocket communication), blocking database operations can slow down event loops.
+    By using this decorator, Django converts synchronous database queries into asynchronous operations, 
+    preventing any blocking from occurring and improving performance in an asynchronous environment.
+    
     Args:
         token (str): The JWT token to be decoded and validated.
         

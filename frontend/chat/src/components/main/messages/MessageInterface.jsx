@@ -23,7 +23,7 @@ const MessageInterface = () => {
 
   const token = Cookies.get("access_token");
   
-  // Constructing the WebSocket URL
+  // Constructing the WebSocket URL (ws is unsecured wss is secured: in PRODUCTION IMPLIMENT WSS)
   const socketURL = channelId ? `ws://localhost:8000/${serverId}/${channelId}/?token=${token}` : null;
 
   // Custom hook for fetching data from the API
@@ -57,7 +57,14 @@ const MessageInterface = () => {
         console.log(error);
       }
     },
-    onClose: () => console.log("WebSocket connection closed."),
+    onClose: (event) => {
+      if (event.code === 4001) {
+        console.log("Authentication error: WebSocket connection closed due to unauthenticated user.");
+      } else {
+        console.log("WebSocket connection closed with code:", event.code);
+      }
+      console.log("WebSocket connection closed.")
+      },
     onError: () => console.log("An error occurred with the WebSocket connection."),
     onMessage: handleIncomingMessage,
   });

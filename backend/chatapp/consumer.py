@@ -2,7 +2,7 @@ import logging
 from channels.generic.websocket import JsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 from .models import Conversation, Message
-from account.models import UserProfile
+from django.contrib.auth.models import AnonymousUser
 
 
 # Create a logger instance
@@ -19,7 +19,7 @@ class ChatAppConsumer(JsonWebsocketConsumer):
         # Get the authenticated user from the scope, which is set by the JWTWebsocketAuthMiddleware
         self.user_profile = self.scope.get("user")
         
-        if self.user_profile is None or not isinstance(self.user_profile, UserProfile):
+        if self.user_profile is None or isinstance(self.user_profile, AnonymousUser):
             # Log connection rejection due to unauthenticated user
             logger.warning("WebSocket connection rejected: Unauthenticated user")
             self.close(code=4001)

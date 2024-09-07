@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
+import useTokenMonitor from './useTokenMonitor';
 import axios from 'axios';
 
 /**
@@ -12,6 +13,9 @@ import axios from 'axios';
 const useAuthAxios = () => {
     const navigate = useNavigate();
     const isProduction = process.env.NODE_ENV === "production";
+
+    // Call useTokenMonitor hook to monitor token expiration
+    useTokenMonitor("/token-refereh/");
 
     // Create an Axios instance configured to interact with the authentication API
     const authAxios = axios.create({
@@ -29,6 +33,7 @@ const useAuthAxios = () => {
         Cookies.remove("sessionid");
         navigate("/login"); // Redirect to the login page
     };
+
 
     /**
      * Helper function to set a cookie with secure and sameSite options
