@@ -1,5 +1,5 @@
 import { Box, Typography, TextField, useTheme } from "@mui/material";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useWebSocket from "react-use-websocket";
 import { useParams } from "react-router-dom";
 import useCrud from "../../../hooks/useCrud";
@@ -7,7 +7,11 @@ import { MessageInterfaceStyles } from "./MessageInterfaceStyles";
 import { useServerByIdContext } from "../../../context/ServerByIdContext";
 import MessageInterfaceChannels from "./MessageInterfaceChannels";
 import MessageList from "./MessageList";
+import SnackbarManager from "../../snackbar/SnackbarManager"
+import handleIncomingMessage from "./Incoming Messages";
+import useTokenMonitor from "../../../hooks/useTokenMonitor"
 import Cookies from "js-cookie"
+import { reconnectWebSocket } from "./WS-Reconnect";
 /**
  * MessageInterface component that handles WebSocket connection and displays messages.
  */
@@ -15,11 +19,13 @@ const MessageInterface = () => {
   const theme = useTheme();
   const classes = MessageInterfaceStyles(theme);
   // State for storing messages and the input message
-  const [newMessages, setNewMessages] = useState([]);
-  const [message, setMessage] = useState("");
+  const [newMessages, setNewMessages] = useState([]); // the conversation 
+  const [message, setMessage] = useState(""); // new messages to be sent
+  const snackbarRef = useRef(); // Refrence to trigger the SnackbarManager
+  const { serverId, channelId } = useParams();  // Extracting serverId and channelId from URL parameters
 
-  // Extracting serverId and channelId from URL parameters
-  const { serverId, channelId } = useParams();
+  // Monitoring the token expiration and refreshing it automatically
+  useTokenMonitor();
 
   const token = Cookies.get("access_token");
   
@@ -28,29 +34,23 @@ const MessageInterface = () => {
 
   // Custom hook for fetching data from the API
   const { fetchData, serverData } = useCrud([], `/messages/?channel_id=${channelId}`);
-
   const { serverName, serverDescription } = useServerByIdContext();
   
-  // Function to handle incoming WebSocket messages
-  const handleIncomingMessage = useCallback((message) => {
-    const msgData = JSON.parse(message.data); 
-    // Create a structured object for the new message
-    const newMessage = {
-      id: msgData.id,
-      sender: msgData.sender,
-      content: msgData.content,
-      timestamp: msgData.timestamp,
-    };
-    // Updating the newMessages state with the new message
-    setNewMessages((prevMessages) => [...prevMessages, newMessage]);
-  }, []);
+
+  /**
+   * Function to handle incoming Websocket messages.
+   * @param {object} message - The incoming Websocket message.
+   */
+  const handleMessage = useCallback((message) => {
+    handleIncomingMessage(message, setNewMessages); // Call the imported utility function to handle incoming messages
+  },[]);
 
   // WebSocket hook to handle connection and messages
   const { sendJsonMessage } = useWebSocket(socketURL, {
     onOpen: async () => {
       console.log("WebSocket Connected");
       try {
-        await fetchData(); // Fetch messages when WebSocket opens
+        await fetchData(); // Fetches the conversation when WebSocket opens
         setNewMessages(Array.isArray(serverData) ? serverData : []);
         console.log("Fetched initial messages:", serverData); // Debugging line
       } catch (error) {
@@ -60,13 +60,21 @@ const MessageInterface = () => {
     onClose: (event) => {
       if (event.code === 4001) {
         console.log("Authentication error: WebSocket connection closed due to unauthenticated user.");
+        snackbarRef.current.triggerSnackbar("Authentication failed. Please log in again.")
+      } else if (event.code === 1006) {
+        console.warn("WebSocket closed abnormally. Attempting to reconnect...");
+        const attemptReconnect = reconnectWebSocket(sendJsonMessage, 5, 5000, () => {
+          if (snackbarRef.current) {
+            snackbarRef.current.triggerSnackbar("Connection lost. Please refresh the page or try again later.");
+          }
+        });
+        attemptReconnect();  // Initiate reconnection attempts.
       } else {
-        console.log("WebSocket connection closed with code:", event.code);
-      }
-      console.log("WebSocket connection closed.")
+        console.log("WebSocket connection closed with code:", event.code)
+        }
       },
-    onError: () => console.log("An error occurred with the WebSocket connection."),
-    onMessage: handleIncomingMessage,
+    onError: (error) => console.error("WebSocket encountered an error:", error),
+    onMessage: handleMessage,  // process Websocket messages with handleMessage func.
   });
 
   // Effect to update messages whenever serverData changes
@@ -85,7 +93,6 @@ const MessageInterface = () => {
 
   /**
    * Handle key down event for the input field.
-   *
    * @param {React.KeyboardEvent<HTMLInputElement>} e - The keyboard event.
    */
   const handleKeyDown = (e) => {
@@ -98,7 +105,6 @@ const MessageInterface = () => {
 
   /**
    * Handle form submission for sending a message.
-   *
    * @param {React.FormEvent} e - The form submission event.
    */
   const handleSendMessage = (e) => {
@@ -153,6 +159,7 @@ const MessageInterface = () => {
           </Box>
         </>
       )}
+      <SnackbarManager ref={snackbarRef} />
     </>
   );
 };

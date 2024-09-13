@@ -13,7 +13,9 @@ import axios from "axios";
  * // Use inside a component to automatically monitor and refresh JWT tokens
  * useTokenMonitor("/auth/refresh/");
  */
-const useTokenMonitor = (refreshUrl) => {
+const useTokenMonitor = () => {
+    // Use the base URL from the environment variable and append the refresh token path
+    const refreshUrl = `${process.env.REACT_APP_AUTH_API_URL}/token-refresh/`;
     /**
      * Decode the JWT token and return its expiration time (in seconds since epoch).
      *

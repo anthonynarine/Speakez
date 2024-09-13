@@ -95,7 +95,7 @@ const useAuthAxios = () => {
         // Set access token if present in the response
         const accessToken = response.data.access_token;
         if (accessToken) {
-            setCookie("access_token", accessToken, { expires: 1 / 1440 }); // 15 minutes expiry
+            setCookie("access_token", accessToken, { expires: new Date(Date.now() + 15 * 60 * 1000) }); // 15 minutes expiry
         }
 
         // Set refresh token if present in the response
@@ -134,7 +134,7 @@ const useAuthAxios = () => {
                     const newAccessToken = response.data.access_token;
 
                     // Store the new access token in a cookie
-                    setCookie("access_token", newAccessToken, { expires: 1 / 96 });
+                    setCookie("access_token", newAccessToken, { expires: new Date(Date.now() + 15 * 60 * 1000) });
 
                     // Update the authorization header for the original request
                     originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
