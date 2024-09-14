@@ -2,9 +2,13 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { CircularProgress, Box } from '@mui/material';
 import { useAuthServices } from '../../context/AuthContext';
+import useTokenMonitor from '../../hooks/useTokenMonitor';
 
 const ProtectedRoute = ({ children }) => {
     const { isLoading, isLoggedIn } = useAuthServices();
+
+    // Start monitoring the token expiration when the user access a protected route
+    useTokenMonitor(isLoggedIn);
 
     if (isLoading) {
         return (

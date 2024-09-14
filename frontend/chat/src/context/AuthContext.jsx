@@ -1,5 +1,6 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
+import useTokenMonitor from "../hooks/useTokenMonitor";
 
 // Create a context for authentication
 const AuthContext = createContext(undefined);
@@ -20,6 +21,9 @@ export function AuthProvider({ children }) {
 
     // Access the auth services using the custom hook
     const authServices = useAuth(); 
+
+    // Call the token monitor once when the AuthProvider is mounted
+    useTokenMonitor();
 
     return(
         <AuthContext.Provider value={authServices}>

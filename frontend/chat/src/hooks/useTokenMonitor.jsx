@@ -2,18 +2,23 @@ import { useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode"; 
 import axios from "axios";
+import useAuthAxios from "./useAuthAxios";
 
 /**
  * Custom hook to monitor JWT token expiration and refresh the token before it expires.
  * This hook will decode the access token, check the expiration time, and set a timeout to refresh the token
  * two minutes before it expires. It handles the refresh process automatically in the background.
+ * 
+ * It handles the refresh process automatically in the background when the user is logged in.
  *
- * @param {string} refreshUrl - The API endpoint to refresh the access token.
+ * @param {isLoggedIn} isLoggedIn - A flag to determine if the user is logged in. 
  * @example
  * // Use inside a component to automatically monitor and refresh JWT tokens
  * useTokenMonitor("/auth/refresh/");
  */
-const useTokenMonitor = () => {
+const useTokenMonitor = (isLoggedIn) => {
+    const { authAxios, setCookie } = useAuthAxios();
+
     // Use the base URL from the environment variable and append the refresh token path
     const refreshUrl = `${process.env.REACT_APP_AUTH_API_URL}/token-refresh/`;
     /**
@@ -40,12 +45,13 @@ const useTokenMonitor = () => {
      */
     const refreshToken = async () => {
         try {
-            const response = await axios.post(refreshUrl, {}, { withCredentials: true });
+            console.log("Attempting to refresh token...");
+            const response = await authAxios.post(refreshUrl, {});
             const newAccessToken = response.data.access_token;
 
             if (newAccessToken) {
                 // Store the new access token in cookies with a 15-minute expiry.
-                Cookies.set("access_token", newAccessToken, { expires: 1 / 96 });
+                setCookie("access_token", newAccessToken, { expires: new Date(Date.now() + 15 * 60 * 1000) });
                 console.log("Token refreshed successfully at", new Date().toLocaleTimeString());
                 return newAccessToken;
             } else {

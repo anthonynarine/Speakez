@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
-import useTokenMonitor from './useTokenMonitor';
 import axios from 'axios';
+
 
 /**
  * Custom hook to create an Axios instance with request and response interceptors
@@ -14,42 +14,42 @@ const useAuthAxios = () => {
     const navigate = useNavigate();
     const isProduction = process.env.NODE_ENV === "production";
 
-    // Call useTokenMonitor hook to monitor token expiration
-    useTokenMonitor("/token-refereh/");
-
+    
     // Create an Axios instance configured to interact with the authentication API
     const authAxios = axios.create({
         baseURL: process.env.REACT_APP_AUTH_API_URL,
         withCredentials: true // Ensure cookies are sent with the request
     });
-
+    
     /**
      * Handle authentication errors by clearing tokens and redirecting to the login page.
-     */
+    */
     const handleAuthError = () => {
-        Cookies.remove("access_token");
-        Cookies.remove("refresh_token");
-        Cookies.remove("csrftoken");
-        Cookies.remove("sessionid");
-        navigate("/login"); // Redirect to the login page
+    Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
+    Cookies.remove("csrftoken");
+    Cookies.remove("sessionid");
+       navigate("/login"); // Redirect to the login page
     };
-
-
+    
+    
     /**
      * Helper function to set a cookie with secure and sameSite options
      * based on the environment.
-     *
-     * @param {string} name - The name of the cookie.
-     * @param {string} value - The value of the cookie.
-     * @param {object} options - Optional additional options for setting the cookie.
-     */
+    *
+    * @param {string} name - The name of the cookie.
+    * @param {string} value - The value of the cookie.
+    * @param {object} options - Optional additional options for setting the cookie.
+    */
     const setCookie = (name, value, options = {}) => {
+
         Cookies.set(name, value, {
             ...options,
             secure: isProduction, // Send cookie over HTTPS only if in production
             sameSite: isProduction ? "None" : "Lax" // Allow third-party cookies in production
         });
     };
+    
 
     /**
      * Request interceptor to attach access token and CSRF token to the request headers.
@@ -166,7 +166,7 @@ const useAuthAxios = () => {
         };
     }, [navigate]);
 
-    return authAxios;
+    return { authAxios, setCookie };
 };
 
 export default useAuthAxios;
