@@ -74,7 +74,7 @@ const useRegister = () => {
     const navigate = useNavigate();
 
     // Custom Axios instance with authentication interceptors
-    const authAxios = useAuthAxios();
+    const { authAxios } = useAuthAxios();
 
     /**
      * Function to handle form field changes.

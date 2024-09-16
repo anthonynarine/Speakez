@@ -4,7 +4,7 @@ import useAuthAxios from "./useAuthAxios";
 import Cookies from 'js-cookie'; 
 
 export const useAuth = () => {
-    const authAxios = useAuthAxios();
+    const { authAxios } = useAuthAxios();
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -66,12 +66,12 @@ export const useAuth = () => {
         }
     }, [authAxios, isLoggedIn]);
 
-    // Revalidate session when the user is logged in
-    useEffect(() => {
-        if (isLoggedIn) {
-            validateSession();  
-        }
-    }, [validateSession, isLoggedIn]);
+    // // Revalidate session when the user is logged in
+    // useEffect(() => {
+    //     if (isLoggedIn) {
+    //         validateSession();  
+    //     }
+    // }, [validateSession, isLoggedIn]);
 
 
 

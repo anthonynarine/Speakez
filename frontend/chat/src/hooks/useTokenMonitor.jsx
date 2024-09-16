@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode"; 
-import axios from "axios";
 import useAuthAxios from "./useAuthAxios";
 
 /**
@@ -45,8 +44,20 @@ const useTokenMonitor = (isLoggedIn) => {
      */
     const refreshToken = async () => {
         try {
+            const refreshToken = Cookies.get("refresh_token"); // Retrieve the refresh token
+
+            if (!refreshToken) {
+                console.error("No refresh token found in cookes.")
+                return null;
+            };
+
             console.log("Attempting to refresh token...");
-            const response = await authAxios.post(refreshUrl, {});
+            const response = await authAxios.post(refreshUrl, {}, {
+                headers: {
+                    Authorization: `Bearer ${refreshToken}`, 
+                }
+            });
+            
             const newAccessToken = response.data.access_token;
 
             if (newAccessToken) {
@@ -84,10 +95,11 @@ const useTokenMonitor = (isLoggedIn) => {
             return;
         }
 
-        const timeUntilRefresh = (expirationTime - currentTime - 120) * 1000; // Refresh 2 minutes before expiration
+        const timeUntilRefresh = Math.max(0, (expirationTime - currentTime - 120) * 1000);  // Refresh 2 minutes before expiration
+        let timeoutId; // Declare timeout ID
 
         if (timeUntilRefresh > 0) {
-            setTimeout(async () => {
+            timeoutId = setTimeout(async () => {
                 const newToken = await refreshToken(); // Attempt to refresh the token before it expires
                 if (!newToken) {
                     console.error("Token refresh failed, user may need to re-login.");
@@ -98,14 +110,19 @@ const useTokenMonitor = (isLoggedIn) => {
             console.warn("Token is already expired or too close to expiration. Immediate refresh needed.");
             refreshToken(); // Immediately refresh if token is near or past expiration
         }
+
+        // Cleanup on component unmount
+        return () => clearTimeout(timeoutId)
     };
 
     /**
      * useEffect hook to start monitoring the token expiration when the component mounts.
      */
     useEffect(() => {
-        monitorTokenExpiration(); // Start monitoring token expiration
-    }, []); // Only run once on component mount.
+        if (isLoggedIn) {
+            monitorTokenExpiration(); // Start monitoring token expiration
+        }
+    }, [isLoggedIn]); // Re-run  if isLoggedIn changes
 };
 
 export default useTokenMonitor;
