@@ -81,6 +81,7 @@ export const useAuth = () => {
         error,
         login,
         logout,
-        isLoggedIn
+        isLoggedIn,
+        validateSession,
     };
 };

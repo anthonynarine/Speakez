@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode"; 
 import useAuthAxios from "./useAuthAxios";
+import { useAuthServices } from "../context/AuthContext";
 
 /**
  * Custom hook to monitor JWT token expiration and refresh the token before it expires.
@@ -17,9 +18,11 @@ import useAuthAxios from "./useAuthAxios";
  */
 const useTokenMonitor = (isLoggedIn) => {
     const { authAxios, setCookie } = useAuthAxios();
+    const { validateSession } = useAuthServices();
 
     // Use the base URL from the environment variable and append the refresh token path
     const refreshUrl = `${process.env.REACT_APP_AUTH_API_URL}/token-refresh/`;
+    
     /**
      * Decode the JWT token and return its expiration time (in seconds since epoch).
      *
@@ -44,19 +47,15 @@ const useTokenMonitor = (isLoggedIn) => {
      */
     const refreshToken = async () => {
         try {
-            const refreshToken = Cookies.get("refresh_token"); // Retrieve the refresh token
+            const refreshCookie = Cookies.get("refresh_token"); // Retrieve the refresh token
 
-            if (!refreshToken) {
-                console.error("No refresh token found in cookes.")
+            if (!refreshCookie) {
+                console.error("No refresh token found in cookies.");
                 return null;
-            };
+            }
 
             console.log("Attempting to refresh token...");
-            const response = await authAxios.post(refreshUrl, {}, {
-                headers: {
-                    Authorization: `Bearer ${refreshToken}`, 
-                }
-            });
+            const response = await authAxios.post(refreshUrl);
             
             const newAccessToken = response.data.access_token;
 
@@ -64,6 +63,9 @@ const useTokenMonitor = (isLoggedIn) => {
                 // Store the new access token in cookies with a 15-minute expiry.
                 setCookie("access_token", newAccessToken, { expires: new Date(Date.now() + 15 * 60 * 1000) });
                 console.log("Token refreshed successfully at", new Date().toLocaleTimeString());
+                
+                // Validate session and fetch user info after refreshing
+                await validateSession();
                 return newAccessToken;
             } else {
                 console.error("No access token found in the refresh response.");
@@ -84,7 +86,7 @@ const useTokenMonitor = (isLoggedIn) => {
 
         if (!accessToken) {
             console.warn("No access token found in cookies.");
-            return;
+            return null;
         }
 
         const expirationTime = getTokenExpirationTime(accessToken);
@@ -92,37 +94,43 @@ const useTokenMonitor = (isLoggedIn) => {
 
         if (!expirationTime) {
             console.warn("Failed to get expiration time from access token.");
-            return;
+            return null;
         }
 
         const timeUntilRefresh = Math.max(0, (expirationTime - currentTime - 120) * 1000);  // Refresh 2 minutes before expiration
-        let timeoutId; // Declare timeout ID
 
-        if (timeUntilRefresh > 0) {
-            timeoutId = setTimeout(async () => {
-                const newToken = await refreshToken(); // Attempt to refresh the token before it expires
-                if (!newToken) {
-                    console.error("Token refresh failed, user may need to re-login.");
-                    // Handle refresh failure (e.g., log the user out or notify them)
-                }
-            }, timeUntilRefresh);
-        } else {
-            console.warn("Token is already expired or too close to expiration. Immediate refresh needed.");
-            refreshToken(); // Immediately refresh if token is near or past expiration
-        }
+        const timeoutId = setTimeout(async () => {
+            const newToken = await refreshToken(); // Attempt to refresh the token before it expires
+            if (!newToken) {
+                console.error("Token refresh failed, user may need to re-login.");
+                // Handle refresh failure (e.g., log the user out or notify them)
+            }
+        }, timeUntilRefresh);
 
-        // Cleanup on component unmount
-        return () => clearTimeout(timeoutId)
+        // Return the timeout ID to allow cleanup in useEffect
+        return timeoutId;
     };
 
     /**
      * useEffect hook to start monitoring the token expiration when the component mounts.
      */
     useEffect(() => {
-        if (isLoggedIn) {
-            monitorTokenExpiration(); // Start monitoring token expiration
+        let timeoutId; // Declare timeout ID
+
+        const refreshCookie = Cookies.get("refresh_token");
+
+        if (isLoggedIn || refreshCookie) {
+            timeoutId = monitorTokenExpiration(); // Start monitoring token expiration
         }
-    }, [isLoggedIn]); // Re-run  if isLoggedIn changes
+
+        // Cleanup on unmount
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId); // Clear timeout to avoid memory leaks
+        };
+    }, [isLoggedIn]); // Re-run if isLoggedIn changes
+
+    // Return the refreshToken function so it can be used outside the hook.
+    return { refreshToken };
 };
 
 export default useTokenMonitor;
